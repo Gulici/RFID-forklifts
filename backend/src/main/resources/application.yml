@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: rfid-backend
+  datasource:
+    url: jdbc:postgresql://localhost5432/rfid_forklifts
+    username: admin
+    password: admin
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+    hibernate:
+      ddl-auto: create-drop
+
+server:
+  port: 8080
