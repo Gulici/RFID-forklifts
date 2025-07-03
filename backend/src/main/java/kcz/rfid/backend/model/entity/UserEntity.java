@@ -28,4 +28,8 @@ public class UserEntity extends EntityBase {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<RoleEntity> roles;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "firm_id", nullable = false)
+    private FirmEntity firm;
 }
