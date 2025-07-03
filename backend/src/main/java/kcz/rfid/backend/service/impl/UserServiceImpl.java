@@ -1,7 +1,6 @@
 package kcz.rfid.backend.service.impl;
 
 import kcz.rfid.backend.config.security.UserDetailsImpl;
-import kcz.rfid.backend.model.dto.UserDto;
 import kcz.rfid.backend.model.entity.UserEntity;
 import kcz.rfid.backend.model.repository.EntityRepository;
 import kcz.rfid.backend.model.repository.UserRepository;

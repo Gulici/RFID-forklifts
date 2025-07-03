@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres
+    container_name: rfid_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: rfid_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_rfid:/var/lib/postgresql/data
+
+
+volumes:
+  postgres_data:

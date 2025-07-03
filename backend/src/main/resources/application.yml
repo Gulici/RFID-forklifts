@@ -1,8 +1,10 @@
 spring:
+  main:
+    allow-bean-definition-overriding: true
   application:
     name: rfid-backend
   datasource:
-    url: jdbc:postgresql://localhost5432/rfid_forklifts
+    url: jdbc:postgresql://localhost:5432/rfid_db
     username: admin
     password: admin
   jpa:
@@ -10,8 +12,9 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+        default_schema: public
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
 
 server:
   port: 8080
