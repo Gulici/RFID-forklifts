@@ -18,6 +18,12 @@ public class LocationEntity extends EntityBase {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(nullable = false, unique = true)
+    private int zoneId;
+
+    @Column(nullable = false)
+    private int x,y;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "firm_id", nullable = false)
     private FirmEntity firm;
@@ -28,6 +34,4 @@ public class LocationEntity extends EntityBase {
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
     private List<LocationHistoryEntity> locationHistoryList = new ArrayList<>();
 
-    @Column(nullable = false)
-    private int x,y;
 }
