@@ -2,12 +2,18 @@ package kcz.rfid.backend.service.impl;
 
 import kcz.rfid.backend.exception.ResourceAlreadyExistsException;
 import kcz.rfid.backend.model.dto.FirmDto;
+import kcz.rfid.backend.model.dto.ForkliftDto;
+import kcz.rfid.backend.model.dto.LocationDto;
 import kcz.rfid.backend.model.dto.UserRegisterDto;
 import kcz.rfid.backend.model.entity.FirmEntity;
+import kcz.rfid.backend.model.entity.ForkliftEntity;
+import kcz.rfid.backend.model.entity.LocationEntity;
 import kcz.rfid.backend.model.entity.UserEntity;
 import kcz.rfid.backend.model.repository.EntityRepository;
 import kcz.rfid.backend.model.repository.FirmRepository;
 import kcz.rfid.backend.service.FirmService;
+import kcz.rfid.backend.service.ForkliftService;
+import kcz.rfid.backend.service.LocationService;
 import kcz.rfid.backend.service.UserService;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +22,15 @@ public class FirmServiceImpl extends EntityServiceBase<FirmEntity> implements Fi
 
     private final FirmRepository firmRepository;
     private final UserService userService;
+    private final LocationService locationService;
+    private final ForkliftService forkliftService;
 
-    public FirmServiceImpl(EntityRepository<FirmEntity> repository, FirmRepository firmRepository, UserService userService) {
+    public FirmServiceImpl(EntityRepository<FirmEntity> repository, FirmRepository firmRepository, UserService userService, LocationService locationService, ForkliftService forkliftService) {
         super(repository);
         this.firmRepository = firmRepository;
         this.userService = userService;
+        this.locationService = locationService;
+        this.forkliftService = forkliftService;
     }
 
     @Override
@@ -46,9 +56,26 @@ public class FirmServiceImpl extends EntityServiceBase<FirmEntity> implements Fi
     }
 
     @Override
-    public FirmEntity addUserToFirm(FirmEntity firmEntity, UserRegisterDto userRegisterDto) {
-        userService.createUser(userRegisterDto, firmEntity);
-        return firmRepository.save(firmEntity);
+    public UserEntity addUserToFirm(FirmEntity firmEntity, UserRegisterDto userRegisterDto) {
+        UserEntity newUser = userService.createUser(userRegisterDto, firmEntity);
+        firmEntity.getUsers().add(newUser);
+        firmRepository.save(firmEntity);
+        return newUser;
     }
 
+    @Override
+    public LocationEntity addLocationToFirm(FirmEntity firmEntity, LocationDto locationDto) {
+        LocationEntity newLocation = locationService.createLocation(locationDto, firmEntity);
+        firmEntity.getLocations().add(newLocation);
+        firmRepository.save(firmEntity);
+        return newLocation;
+    }
+
+    @Override
+    public ForkliftEntity addForkliftToFirm(FirmEntity firmEntity, ForkliftDto forkliftDto) {
+        ForkliftEntity newForklift = forkliftService.createForklift(forkliftDto, firmEntity);
+        firmEntity.getForklifts().add(newForklift);
+        firmRepository.save(firmEntity);
+        return newForklift;
+    }
 }

@@ -8,9 +8,11 @@ import kcz.rfid.backend.model.entity.LocationEntity;
 import kcz.rfid.backend.model.repository.EntityRepository;
 import kcz.rfid.backend.model.repository.LocationRepository;
 import kcz.rfid.backend.service.LocationService;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+@Service
 public class LocationServiceImpl extends EntityServiceBase<LocationEntity> implements LocationService {
 
     private final LocationRepository locationRepository;

@@ -3,16 +3,19 @@ package kcz.rfid.backend.service.impl;
 import kcz.rfid.backend.exception.ResourceAlreadyExistsException;
 import kcz.rfid.backend.exception.ResourceNotFoundException;
 import kcz.rfid.backend.model.dto.ForkliftDto;
+import kcz.rfid.backend.model.entity.FirmEntity;
 import kcz.rfid.backend.model.entity.ForkliftEntity;
 import kcz.rfid.backend.model.entity.LocationEntity;
 import kcz.rfid.backend.model.entity.LocationHistoryEntity;
 import kcz.rfid.backend.model.repository.EntityRepository;
 import kcz.rfid.backend.model.repository.ForkliftRepository;
 import kcz.rfid.backend.service.ForkliftService;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Service
 public class ForkliftServiceImpl extends EntityServiceBase<ForkliftEntity> implements ForkliftService {
 
     private final ForkliftRepository forkliftRepository;
@@ -23,12 +26,13 @@ public class ForkliftServiceImpl extends EntityServiceBase<ForkliftEntity> imple
     }
 
     @Override
-    public ForkliftEntity createForklift(ForkliftDto forkliftDto) {
+    public ForkliftEntity createForklift(ForkliftDto forkliftDto, FirmEntity firmEntity) {
         if (forkliftRepository.findByName(forkliftDto.getName()).isPresent()) {
             throw new ResourceAlreadyExistsException("Forklift with name " + forkliftDto.getName() + " already exists");
         }
         ForkliftEntity forkliftEntity = new ForkliftEntity();
         forkliftEntity.setName(forkliftDto.getName());
+        forkliftEntity.setFirm(firmEntity);
         return forkliftEntity;
     }
 
