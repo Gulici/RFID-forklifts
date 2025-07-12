@@ -1,5 +1,7 @@
 package kcz.rfid.backend.service;
 
+import kcz.rfid.backend.model.dto.FirmDto;
+import kcz.rfid.backend.model.dto.UserRegisterDto;
 import kcz.rfid.backend.model.entity.*;
 import kcz.rfid.backend.model.entity.util.RoleEnum;
 import kcz.rfid.backend.model.repository.*;
@@ -19,13 +21,15 @@ public class InitService {
     private final LocationRepository locationRepository;
     private final ForkliftRepository forkliftRepository;
     private final FirmRepository firmRepository;
+    private final FirmService firmService;
 
-    public InitService(RoleRepository roleRepository, UserRepository userRepository, LocationRepository locationRepository, ForkliftRepository forkliftRepository, FirmRepository firmRepository) {
+    public InitService(RoleRepository roleRepository, UserRepository userRepository, LocationRepository locationRepository, ForkliftRepository forkliftRepository, FirmRepository firmRepository, FirmService firmService) {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.locationRepository = locationRepository;
         this.forkliftRepository = forkliftRepository;
         this.firmRepository = firmRepository;
+        this.firmService = firmService;
     }
 
     public void createRoles() {
@@ -111,4 +115,24 @@ public class InitService {
             firmRepository.save(firm);
         }
     }
+
+    public void testFirmCreation() {
+        if (firmRepository.findAll().isEmpty()) {
+            FirmDto firmDto = new FirmDto();
+            firmDto.setFirmName("Test Firm");
+            firmDto.setAdminName("admin");
+            firmDto.setAdminEmail("admin@mail.com");
+            firmDto.setPassword("password");
+
+            FirmEntity firm = firmService.createFirm(firmDto);
+
+            UserRegisterDto userRegisterDto = new UserRegisterDto();
+            userRegisterDto.setFirmName("Test Firm");
+            userRegisterDto.setUsername("User");
+            userRegisterDto.setPassword("password");
+            userRegisterDto.setEmail("User@mail.com");
+            firmService.addUserToFirm(firm, userRegisterDto);
+        }
+    }
+
 }
