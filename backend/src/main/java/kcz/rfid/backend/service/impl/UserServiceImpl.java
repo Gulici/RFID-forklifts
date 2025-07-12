@@ -2,7 +2,7 @@ package kcz.rfid.backend.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import kcz.rfid.backend.config.security.UserDetailsImpl;
-import kcz.rfid.backend.exeption.ResourceAlreadyExistsException;
+import kcz.rfid.backend.exception.ResourceAlreadyExistsException;
 import kcz.rfid.backend.model.dto.UserRegisterDto;
 import kcz.rfid.backend.model.entity.FirmEntity;
 import kcz.rfid.backend.model.entity.RoleEntity;
@@ -19,9 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.UUID;
-
-import static kcz.rfid.backend.model.mapper.UserMapper.updateUserFromDto;
 
 @Service
 public class UserServiceImpl extends EntityServiceBase<UserEntity> implements UserService, UserDetailsService {

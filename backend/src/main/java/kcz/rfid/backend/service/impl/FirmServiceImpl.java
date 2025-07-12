@@ -1,6 +1,6 @@
 package kcz.rfid.backend.service.impl;
 
-import kcz.rfid.backend.exeption.ResourceAlreadyExistsException;
+import kcz.rfid.backend.exception.ResourceAlreadyExistsException;
 import kcz.rfid.backend.model.dto.FirmDto;
 import kcz.rfid.backend.model.dto.UserRegisterDto;
 import kcz.rfid.backend.model.entity.FirmEntity;

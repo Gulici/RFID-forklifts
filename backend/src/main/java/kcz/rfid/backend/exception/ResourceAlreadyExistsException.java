@@ -1,4 +1,4 @@
-package kcz.rfid.backend.exeption;
+package kcz.rfid.backend.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
