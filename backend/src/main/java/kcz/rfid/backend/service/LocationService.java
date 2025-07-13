@@ -2,11 +2,20 @@ package kcz.rfid.backend.service;
 
 import kcz.rfid.backend.model.dto.LocationDto;
 import kcz.rfid.backend.model.entity.FirmEntity;
+import kcz.rfid.backend.model.entity.ForkliftEntity;
 import kcz.rfid.backend.model.entity.LocationEntity;
+import kcz.rfid.backend.model.entity.LocationHistoryEntity;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface LocationService extends EntityService<LocationEntity> {
     LocationEntity createLocation(LocationDto locationDto, FirmEntity firmEntity);
     LocationEntity updateLocation(LocationDto locationDto, UUID locationId);
+
+    LocationHistoryEntity createNewLocationHistoryEntry(LocationEntity location, ForkliftEntity forklift);
+
+    List<LocationHistoryEntity> getLocationHistoryForFirm(FirmEntity firmEntity);
+    List<LocationHistoryEntity> getLocationHistoryForForklift(ForkliftEntity forkliftEntity);
+
 }

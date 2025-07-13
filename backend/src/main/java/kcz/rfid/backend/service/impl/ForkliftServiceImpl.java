@@ -6,23 +6,24 @@ import kcz.rfid.backend.model.dto.ForkliftDto;
 import kcz.rfid.backend.model.entity.FirmEntity;
 import kcz.rfid.backend.model.entity.ForkliftEntity;
 import kcz.rfid.backend.model.entity.LocationEntity;
-import kcz.rfid.backend.model.entity.LocationHistoryEntity;
 import kcz.rfid.backend.model.repository.EntityRepository;
 import kcz.rfid.backend.model.repository.ForkliftRepository;
 import kcz.rfid.backend.service.ForkliftService;
+import kcz.rfid.backend.service.LocationService;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
 public class ForkliftServiceImpl extends EntityServiceBase<ForkliftEntity> implements ForkliftService {
 
     private final ForkliftRepository forkliftRepository;
+    private final LocationService locationService;
 
-    public ForkliftServiceImpl(EntityRepository<ForkliftEntity> repository, ForkliftRepository forkliftRepository) {
+    public ForkliftServiceImpl(EntityRepository<ForkliftEntity> repository, ForkliftRepository forkliftRepository, LocationService locationService) {
         super(repository);
         this.forkliftRepository = forkliftRepository;
+        this.locationService = locationService;
     }
 
     @Override
@@ -54,15 +55,8 @@ public class ForkliftServiceImpl extends EntityServiceBase<ForkliftEntity> imple
     @Override
     public void updateLocation(ForkliftEntity forkliftEntity, LocationEntity locationEntity) {
         forkliftEntity.setLocation(locationEntity);
-        updateLocationHistory(forkliftEntity, locationEntity);
+        var historyEntry = locationService.createNewLocationHistoryEntry(locationEntity, forkliftEntity);
+        forkliftEntity.getLocationHistoryList().add(historyEntry);
         forkliftRepository.save(forkliftEntity);
-    }
-
-    private void updateLocationHistory(ForkliftEntity forkliftEntity, LocationEntity locationEntity) {
-        LocationHistoryEntity newLog = new LocationHistoryEntity();
-        newLog.setLocation(locationEntity);
-        newLog.setTimestamp(LocalDateTime.now());
-        newLog.setForklift(forkliftEntity);
-        forkliftEntity.getLocationHistoryList().add(newLog);
     }
 }

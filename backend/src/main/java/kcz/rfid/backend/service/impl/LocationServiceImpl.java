@@ -4,22 +4,29 @@ import kcz.rfid.backend.exception.ResourceAlreadyExistsException;
 import kcz.rfid.backend.exception.ResourceNotFoundException;
 import kcz.rfid.backend.model.dto.LocationDto;
 import kcz.rfid.backend.model.entity.FirmEntity;
+import kcz.rfid.backend.model.entity.ForkliftEntity;
 import kcz.rfid.backend.model.entity.LocationEntity;
+import kcz.rfid.backend.model.entity.LocationHistoryEntity;
 import kcz.rfid.backend.model.repository.EntityRepository;
+import kcz.rfid.backend.model.repository.LocationHistoryRepository;
 import kcz.rfid.backend.model.repository.LocationRepository;
 import kcz.rfid.backend.service.LocationService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 public class LocationServiceImpl extends EntityServiceBase<LocationEntity> implements LocationService {
 
     private final LocationRepository locationRepository;
+    private final LocationHistoryRepository locationHistoryRepository;
 
-    public LocationServiceImpl(EntityRepository<LocationEntity> repository, LocationRepository locationRepository) {
+    public LocationServiceImpl(EntityRepository<LocationEntity> repository, LocationRepository locationRepository, LocationHistoryRepository locationHistoryRepository) {
         super(repository);
         this.locationRepository = locationRepository;
+        this.locationHistoryRepository = locationHistoryRepository;
     }
 
     @Override
@@ -69,5 +76,25 @@ public class LocationServiceImpl extends EntityServiceBase<LocationEntity> imple
         locationEntity.setY(locationDto.getY());
 
         return locationRepository.save(locationEntity);
+    }
+
+    @Override
+    public LocationHistoryEntity createNewLocationHistoryEntry(LocationEntity location, ForkliftEntity forklift) {
+        LocationHistoryEntity locationHistoryEntity = new LocationHistoryEntity();
+        locationHistoryEntity.setLocation(location);
+        locationHistoryEntity.setForklift(forklift);
+        locationHistoryEntity.setTimestamp(LocalDateTime.now());
+
+        return locationHistoryRepository.save(locationHistoryEntity);
+    }
+
+    @Override
+    public List<LocationHistoryEntity> getLocationHistoryForFirm(FirmEntity firm) {
+        return locationHistoryRepository.findAllByFirm(firm);
+    }
+
+    @Override
+    public List<LocationHistoryEntity> getLocationHistoryForForklift(ForkliftEntity forkliftEntity) {
+        return locationHistoryRepository.findAllByForklift(forkliftEntity);
     }
 }
