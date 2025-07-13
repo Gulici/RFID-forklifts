@@ -6,8 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Getter
@@ -20,8 +19,8 @@ public class RoleEntity extends EntityBase {
     @Enumerated(EnumType.STRING)
     private RoleEnum name;
 
-    @ManyToMany(fetch = FetchType.LAZY,
+    @ManyToMany(fetch = FetchType.EAGER,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH},
             mappedBy = "roles")
-    private List<UserEntity> users = new ArrayList<>();
+    private Set<UserEntity> users = new HashSet<>();
 }

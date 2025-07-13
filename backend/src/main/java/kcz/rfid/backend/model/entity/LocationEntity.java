@@ -7,12 +7,13 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "locations")
 @Getter
 @Setter
-@ToString(exclude = {"forklifts", "locationHistoryList"})
+@ToString(exclude = {"forklifts", "locationHistoryList", "forklifts"})
 public class LocationEntity extends EntityBase {
 
     @Column(nullable = false, unique = true)
@@ -24,7 +25,7 @@ public class LocationEntity extends EntityBase {
     @Column(nullable = false)
     private int x,y;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "firm_id", nullable = false)
     private FirmEntity firm;
 
@@ -33,5 +34,4 @@ public class LocationEntity extends EntityBase {
 
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
     private List<LocationHistoryEntity> locationHistoryList = new ArrayList<>();
-
 }

@@ -43,6 +43,29 @@ public class UserServiceImpl extends EntityServiceBase<UserEntity> implements Us
 
     @Override
     public UserEntity createUser(UserRegisterDto userDto, FirmEntity firmEntity) {
+        UserEntity userEntity = createSimpleUser(userDto, firmEntity);
+        return userRepository.save(userEntity);
+    }
+
+    @Override
+    public UserEntity createAdmin(UserRegisterDto userDto, FirmEntity firmEntity) {
+        UserEntity userEntity = createSimpleUser(userDto, firmEntity);
+
+        RoleEntity adminRole = roleService.getRoleByRole(RoleEnum.ROLE_ADMIN);
+        userEntity.getRoles().add(adminRole);
+        adminRole.getUsers().add(userEntity);
+
+        return userRepository.save(userEntity);
+    }
+
+    private UserEntity createSimpleUser(UserRegisterDto userDto, FirmEntity firmEntity) {
+        if (userDto.getUsername() == null || userDto.getUsername().isEmpty()
+            || userDto.getPassword() == null || userDto.getPassword().isEmpty()
+            || userDto.getEmail() == null || userDto.getEmail().isEmpty()
+            || userDto.getFirmName() == null || userDto.getFirmName().isEmpty() ){
+            throw new IllegalArgumentException("UserDto cannot have null or empty values");
+        }
+
         if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
             throw new ResourceAlreadyExistsException("User with email " + userDto.getEmail() + " already exists");
         }
@@ -55,16 +78,12 @@ public class UserServiceImpl extends EntityServiceBase<UserEntity> implements Us
         userEntity.setEmail(userDto.getEmail());
         userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
         userEntity.setFirm(firmEntity);
-        setUserRole(userEntity);
 
-        return userRepository.save(userEntity);
-    }
+        RoleEntity userRole = roleService.getRoleByRole(RoleEnum.ROLE_USER);
+        userRole.getUsers().add(userEntity);
+        userEntity.getRoles().add(userRole);
 
-    @Override
-    public UserEntity createAdmin(UserRegisterDto userDto, FirmEntity firmEntity) {
-        UserEntity userEntity = createUser(userDto, firmEntity);
-        this.setAdminRole(userEntity);
-        return userRepository.save(userEntity);
+        return userEntity;
     }
 
     @Override
@@ -75,8 +94,9 @@ public class UserServiceImpl extends EntityServiceBase<UserEntity> implements Us
 
     @Override
     public UserEntity setAdminRole(UserEntity user) {
-        RoleEntity userRole = roleService.getRoleByRole(RoleEnum.ROLE_ADMIN);
-        user.getRoles().add(userRole);
+        RoleEntity adminRole = roleService.getRoleByRole(RoleEnum.ROLE_ADMIN);
+        user.getRoles().add(adminRole);
+        adminRole.getUsers().add(user);
         return userRepository.save(user);
     }
 

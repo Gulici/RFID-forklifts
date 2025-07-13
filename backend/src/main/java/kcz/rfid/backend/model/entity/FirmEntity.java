@@ -12,7 +12,7 @@ import java.util.List;
 @Table(name = "firms")
 @Getter
 @Setter
-@ToString(exclude = {"locations", "forklifts"})
+@ToString(exclude = {"users", "locations", "forklifts"})
 public class FirmEntity extends EntityBase {
 
     @Column(nullable = false, unique = true)

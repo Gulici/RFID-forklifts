@@ -27,13 +27,18 @@ public class ForkliftServiceImpl extends EntityServiceBase<ForkliftEntity> imple
 
     @Override
     public ForkliftEntity createForklift(ForkliftDto forkliftDto, FirmEntity firmEntity) {
+        if (forkliftDto.getName() == null || forkliftDto.getName().isEmpty()) {
+            throw new IllegalArgumentException("ForkliftDto cannot have null or empty values");
+        }
+
         if (forkliftRepository.findByName(forkliftDto.getName()).isPresent()) {
             throw new ResourceAlreadyExistsException("Forklift with name " + forkliftDto.getName() + " already exists");
         }
         ForkliftEntity forkliftEntity = new ForkliftEntity();
         forkliftEntity.setName(forkliftDto.getName());
         forkliftEntity.setFirm(firmEntity);
-        return forkliftEntity;
+
+        return forkliftRepository.save(forkliftEntity);
     }
 
     @Override

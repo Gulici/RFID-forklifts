@@ -1,6 +1,7 @@
 package kcz.rfid.backend.service.impl;
 
 import kcz.rfid.backend.exception.ResourceAlreadyExistsException;
+import kcz.rfid.backend.exception.ResourceNotFoundException;
 import kcz.rfid.backend.model.dto.FirmDto;
 import kcz.rfid.backend.model.dto.ForkliftDto;
 import kcz.rfid.backend.model.dto.LocationDto;
@@ -16,8 +17,13 @@ import kcz.rfid.backend.service.ForkliftService;
 import kcz.rfid.backend.service.LocationService;
 import kcz.rfid.backend.service.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
+@Transactional
 public class FirmServiceImpl extends EntityServiceBase<FirmEntity> implements FirmService {
 
     private final FirmRepository firmRepository;
@@ -35,6 +41,12 @@ public class FirmServiceImpl extends EntityServiceBase<FirmEntity> implements Fi
 
     @Override
     public FirmEntity createFirm(FirmDto firm) {
+        if (firm.getFirmName() == null || firm.getFirmName().isEmpty()
+            || firm.getAdminName() == null || firm.getAdminName().isEmpty()
+            || firm.getAdminEmail() == null || firm.getAdminEmail().isEmpty()
+            || firm.getPassword() == null || firm.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("Firm must have firmName and adminName and adminEmail and password");
+        }
         if (firmRepository.findByFirmName(firm.getFirmName()).isPresent()) {
             throw new ResourceAlreadyExistsException("Firm with name " + firm.getFirmName() + " already exists");
         }
@@ -58,7 +70,6 @@ public class FirmServiceImpl extends EntityServiceBase<FirmEntity> implements Fi
     @Override
     public UserEntity addUserToFirm(FirmEntity firmEntity, UserRegisterDto userRegisterDto) {
         UserEntity newUser = userService.createUser(userRegisterDto, firmEntity);
-        firmEntity.getUsers().add(newUser);
         firmRepository.save(firmEntity);
         return newUser;
     }

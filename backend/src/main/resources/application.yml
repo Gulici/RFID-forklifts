@@ -10,11 +10,11 @@ spring:
   jpa:
     properties:
       hibernate:
-        show_sql: true
+        show_sql: false
         format_sql: true
         default_schema: public
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
 
 server:
   port: 8080

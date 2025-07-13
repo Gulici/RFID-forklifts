@@ -24,6 +24,10 @@ public class LocationServiceImpl extends EntityServiceBase<LocationEntity> imple
 
     @Override
     public LocationEntity createLocation(LocationDto locationDto, FirmEntity firmEntity) {
+        if (locationDto.getZoneId() == null || locationDto.getName() == null || locationDto.getName().isEmpty()) {
+            throw new IllegalArgumentException("LocationDto cannot have null or empty values");
+        }
+
         if (locationRepository.findByName(locationDto.getName()).isPresent()) {
             throw new ResourceAlreadyExistsException("Location with name " + locationDto.getName() + " already exists");
         }
@@ -38,7 +42,7 @@ public class LocationServiceImpl extends EntityServiceBase<LocationEntity> imple
         locationEntity.setX(locationDto.getX());
         locationEntity.setY(locationDto.getY());
 
-        return locationEntity;
+        return locationRepository.save(locationEntity);
     }
 
     @Override

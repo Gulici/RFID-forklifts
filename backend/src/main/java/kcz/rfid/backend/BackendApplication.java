@@ -36,7 +36,5 @@ public class BackendApplication implements CommandLineRunner {
     private void createTestData() {
         initService.createRoles();
         initService.testFirmCreation();
-//        initService.createFirmAndForklifts();
-//        initService.createUsers();
     }
 }
