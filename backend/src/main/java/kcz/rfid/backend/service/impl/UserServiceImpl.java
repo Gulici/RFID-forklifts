@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -93,6 +94,12 @@ public class UserServiceImpl extends EntityServiceBase<UserEntity> implements Us
     }
 
     @Override
+    public UserEntity findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User with username " + username + " not found"));
+    }
+
+    @Override
     public UserEntity setAdminRole(UserEntity user) {
         RoleEntity adminRole = roleService.getRoleByRole(RoleEnum.ROLE_ADMIN);
         user.getRoles().add(adminRole);
@@ -104,5 +111,10 @@ public class UserServiceImpl extends EntityServiceBase<UserEntity> implements Us
     public void setUserRole(UserEntity user) {
         RoleEntity userRole = roleService.getRoleByRole(RoleEnum.ROLE_USER);
         user.getRoles().add(userRole);
+    }
+
+    @Override
+    public List<UserEntity> findUsersByFirm(FirmEntity firmEntity) {
+        return userRepository.findAllByFirm(firmEntity);
     }
 }
