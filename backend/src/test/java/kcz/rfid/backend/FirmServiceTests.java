@@ -1,7 +1,7 @@
 package kcz.rfid.backend;
 
 import kcz.rfid.backend.exception.ResourceAlreadyExistsException;
-import kcz.rfid.backend.model.dto.FirmDto;
+import kcz.rfid.backend.model.dto.FirmRegisterDto;
 import kcz.rfid.backend.model.dto.ForkliftDto;
 import kcz.rfid.backend.model.dto.LocationDto;
 import kcz.rfid.backend.model.dto.UserRegisterDto;
@@ -46,76 +46,76 @@ public class FirmServiceTests {
     @Test
     void shouldCreateNewFirm() {
         int firmsNum = firmRepository.findAll().size();
-        FirmDto firmDto = new FirmDto();
-        firmDto.setFirmName("Firm From Test");
-        firmDto.setAdminName("Admin From Test");
-        firmDto.setAdminEmail("admin@firmtest.com");
-        firmDto.setPassword("password");
+        FirmRegisterDto firmRegisterDto = new FirmRegisterDto();
+        firmRegisterDto.setFirmName("Firm From Test");
+        firmRegisterDto.setAdminName("Admin From Test");
+        firmRegisterDto.setAdminEmail("admin@firmtest.com");
+        firmRegisterDto.setPassword("password");
 
-        FirmEntity newFirm = firmService.createFirm(firmDto);
+        FirmEntity newFirm = firmService.createFirm(firmRegisterDto);
 
         int newFirmsNum = firmRepository.findAll().size();
-        UserEntity adminFromRepo = userRepository.findByEmail(firmDto.getAdminEmail()).orElse(null);
+        UserEntity adminFromRepo = userRepository.findByEmail(firmRegisterDto.getAdminEmail()).orElse(null);
         UserEntity admin = newFirm.getUsers().get(0);
 
         Assertions.assertEquals(firmsNum + 1, newFirmsNum);
-        Assertions.assertEquals(firmDto.getFirmName(), newFirm.getFirmName());
+        Assertions.assertEquals(firmRegisterDto.getFirmName(), newFirm.getFirmName());
         Assertions.assertNotNull(adminFromRepo);
         Assertions.assertEquals(admin, adminFromRepo);
     }
 
     @Test
     void shouldNotCreateNewFirm1() {
-        FirmDto firmDto = new FirmDto();
-        firmDto.setFirmName("Firm From Test");
-        firmDto.setAdminName("Admin From Test");
-        firmDto.setAdminEmail("admin@firmtest.com");
-        firmDto.setPassword("password");
+        FirmRegisterDto firmRegisterDto = new FirmRegisterDto();
+        firmRegisterDto.setFirmName("Firm From Test");
+        firmRegisterDto.setAdminName("Admin From Test");
+        firmRegisterDto.setAdminEmail("admin@firmtest.com");
+        firmRegisterDto.setPassword("password");
 
-        firmService.createFirm(firmDto);
+        firmService.createFirm(firmRegisterDto);
 
-        Assertions.assertThrows(ResourceAlreadyExistsException.class, () -> firmService.createFirm(firmDto));
+        Assertions.assertThrows(ResourceAlreadyExistsException.class, () -> firmService.createFirm(firmRegisterDto));
     }
 
     @Test
     void shouldNotCreateNewFirm2() {
-        FirmDto firmDto = new FirmDto();
-        firmDto.setFirmName("Firm From Test");
-        firmDto.setAdminName("Admin From Test");
-        firmDto.setAdminEmail("admin@firmtest.com");
-        firmDto.setPassword("password");
+        FirmRegisterDto firmRegisterDto = new FirmRegisterDto();
+        firmRegisterDto.setFirmName("Firm From Test");
+        firmRegisterDto.setAdminName("Admin From Test");
+        firmRegisterDto.setAdminEmail("admin@firmtest.com");
+        firmRegisterDto.setPassword("password");
 
-        firmService.createFirm(firmDto);
+        firmService.createFirm(firmRegisterDto);
 
-        firmDto.setFirmName("Firm From Test");
-        firmDto.setAdminName("Diffrent Admin From Test");
-        firmDto.setAdminEmail("admin2@firmtest.com");
-        firmDto.setPassword("password");
+        firmRegisterDto.setFirmName("Firm From Test");
+        firmRegisterDto.setAdminName("Diffrent Admin From Test");
+        firmRegisterDto.setAdminEmail("admin2@firmtest.com");
+        firmRegisterDto.setPassword("password");
 
-        Assertions.assertThrows(ResourceAlreadyExistsException.class, () -> firmService.createFirm(firmDto));
+        Assertions.assertThrows(ResourceAlreadyExistsException.class, () -> firmService.createFirm(firmRegisterDto));
     }
 
     @Test
     void shouldNotCreateNewFirm3() {
-        FirmDto firmDto = new FirmDto();
-        firmDto.setFirmName("Firm From Test");
-        firmDto.setAdminName("Admin From Test");
-        firmDto.setAdminEmail("admin@firmtest.com");
-        firmDto.setPassword("password");
-        firmService.createFirm(firmDto);
+        FirmRegisterDto firmRegisterDto = new FirmRegisterDto();
+        firmRegisterDto.setFirmName("Firm From Test");
+        firmRegisterDto.setAdminName("Admin From Test");
+        firmRegisterDto.setAdminEmail("admin@firmtest.com");
+        firmRegisterDto.setPassword("password");
+        firmService.createFirm(firmRegisterDto);
 
-        firmDto.setFirmName("Firm From Test 2");
-        firmDto.setAdminName("Admin From Test");
-        firmDto.setAdminEmail("admin@firmtest.com");
-        firmDto.setPassword("password");
+        firmRegisterDto.setFirmName("Firm From Test 2");
+        firmRegisterDto.setAdminName("Admin From Test");
+        firmRegisterDto.setAdminEmail("admin@firmtest.com");
+        firmRegisterDto.setPassword("password");
 
-        Assertions.assertThrows(ResourceAlreadyExistsException.class, () -> firmService.createFirm(firmDto));
+        Assertions.assertThrows(ResourceAlreadyExistsException.class, () -> firmService.createFirm(firmRegisterDto));
     }
 
     @Test
     void shouldNotCreateNewFirm4() {
-        FirmDto firmDto = new FirmDto();
-        Assertions.assertThrows(IllegalArgumentException.class, () -> firmService.createFirm(firmDto));
+        FirmRegisterDto firmRegisterDto = new FirmRegisterDto();
+        Assertions.assertThrows(IllegalArgumentException.class, () -> firmService.createFirm(firmRegisterDto));
     }
 
     @Test
@@ -244,11 +244,11 @@ public class FirmServiceTests {
     }
 
     private FirmEntity createFirm() {
-        FirmDto firmDto = new FirmDto();
-        firmDto.setFirmName("Firm");
-        firmDto.setAdminName("Admin");
-        firmDto.setAdminEmail("admin@firmtest.com");
-        firmDto.setPassword("password");
-        return firmService.createFirm(firmDto);
+        FirmRegisterDto firmRegisterDto = new FirmRegisterDto();
+        firmRegisterDto.setFirmName("Firm");
+        firmRegisterDto.setAdminName("Admin");
+        firmRegisterDto.setAdminEmail("admin@firmtest.com");
+        firmRegisterDto.setPassword("password");
+        return firmService.createFirm(firmRegisterDto);
     }
 }

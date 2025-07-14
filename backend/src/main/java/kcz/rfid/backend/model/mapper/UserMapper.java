@@ -3,23 +3,18 @@ package kcz.rfid.backend.model.mapper;
 import kcz.rfid.backend.model.dto.UserDto;
 import kcz.rfid.backend.model.dto.UserRegisterDto;
 import kcz.rfid.backend.model.entity.UserEntity;
+import org.springframework.stereotype.Component;
 
-public class UserMapper {
+@Component
+public class UserMapper implements Mapper<UserEntity, UserDto> {
 
-    public static UserDto toDto(UserEntity user) {
-        if (user == null) return null;
+    @Override
+    public UserDto mapToDto(UserEntity userEntity) {
         UserDto userDto = new UserDto();
-        userDto.setUsername(user.getUsername());
-        userDto.setEmail(user.getEmail());
-        userDto.setFirmName(user.getFirm().getFirmName());
+        userDto.setId(userEntity.getId());
+        userDto.setUsername(userEntity.getUsername());
+        userDto.setEmail(userEntity.getEmail());
+        userDto.setFirmName(userEntity.getFirm().getFirmName());
         return userDto;
     }
-
-   public static UserEntity updateUserFromDto(UserRegisterDto userDto, UserEntity user) {
-        if (userDto == null) return null;
-        user.setUsername(userDto.getUsername());
-        user.setEmail(userDto.getEmail());
-        user.setPassword(userDto.getPassword());
-        return user;
-   }
 }

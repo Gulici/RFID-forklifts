@@ -1,6 +1,6 @@
 package kcz.rfid.backend;
 
-import kcz.rfid.backend.model.dto.FirmDto;
+import kcz.rfid.backend.model.dto.FirmRegisterDto;
 import kcz.rfid.backend.model.dto.ForkliftDto;
 import kcz.rfid.backend.model.dto.LocationDto;
 import kcz.rfid.backend.model.entity.FirmEntity;
@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.testcontainers.shaded.org.checkerframework.checker.units.qual.A;
 
 import java.util.List;
 
@@ -57,12 +56,12 @@ public class ForkliftServiceTests {
     }
 
     private FirmEntity createFirm() {
-        FirmDto firmDto = new FirmDto();
-        firmDto.setFirmName("Firm");
-        firmDto.setAdminName("Admin");
-        firmDto.setAdminEmail("admin@firmtest.com");
-        firmDto.setPassword("password");
-        return firmService.createFirm(firmDto);
+        FirmRegisterDto firmRegisterDto = new FirmRegisterDto();
+        firmRegisterDto.setFirmName("Firm");
+        firmRegisterDto.setAdminName("Admin");
+        firmRegisterDto.setAdminEmail("admin@firmtest.com");
+        firmRegisterDto.setPassword("password");
+        return firmService.createFirm(firmRegisterDto);
     }
 
     private ForkliftEntity createForklift() {

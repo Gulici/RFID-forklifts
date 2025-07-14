@@ -1,6 +1,6 @@
 package kcz.rfid.backend.service;
 
-import kcz.rfid.backend.model.dto.FirmDto;
+import kcz.rfid.backend.model.dto.FirmRegisterDto;
 import kcz.rfid.backend.model.dto.UserRegisterDto;
 import kcz.rfid.backend.model.entity.*;
 import kcz.rfid.backend.model.entity.util.RoleEnum;
@@ -118,13 +118,13 @@ public class InitService {
 
     public void testFirmCreation() {
         if (firmRepository.findAll().isEmpty()) {
-            FirmDto firmDto = new FirmDto();
-            firmDto.setFirmName("Test Firm");
-            firmDto.setAdminName("admin");
-            firmDto.setAdminEmail("admin@mail.com");
-            firmDto.setPassword("password");
+            FirmRegisterDto firmRegisterDto = new FirmRegisterDto();
+            firmRegisterDto.setFirmName("Test Firm");
+            firmRegisterDto.setAdminName("admin");
+            firmRegisterDto.setAdminEmail("admin@mail.com");
+            firmRegisterDto.setPassword("password");
 
-            FirmEntity firm = firmService.createFirm(firmDto);
+            FirmEntity firm = firmService.createFirm(firmRegisterDto);
 
             UserRegisterDto userRegisterDto = new UserRegisterDto();
             userRegisterDto.setFirmName("Test Firm");

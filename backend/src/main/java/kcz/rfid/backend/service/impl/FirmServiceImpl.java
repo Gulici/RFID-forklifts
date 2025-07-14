@@ -1,8 +1,7 @@
 package kcz.rfid.backend.service.impl;
 
 import kcz.rfid.backend.exception.ResourceAlreadyExistsException;
-import kcz.rfid.backend.exception.ResourceNotFoundException;
-import kcz.rfid.backend.model.dto.FirmDto;
+import kcz.rfid.backend.model.dto.FirmRegisterDto;
 import kcz.rfid.backend.model.dto.ForkliftDto;
 import kcz.rfid.backend.model.dto.LocationDto;
 import kcz.rfid.backend.model.dto.UserRegisterDto;
@@ -18,9 +17,6 @@ import kcz.rfid.backend.service.LocationService;
 import kcz.rfid.backend.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -40,7 +36,7 @@ public class FirmServiceImpl extends EntityServiceBase<FirmEntity> implements Fi
     }
 
     @Override
-    public FirmEntity createFirm(FirmDto firm) {
+    public FirmEntity createFirm(FirmRegisterDto firm) {
         if (firm.getFirmName() == null || firm.getFirmName().isEmpty()
             || firm.getAdminName() == null || firm.getAdminName().isEmpty()
             || firm.getAdminEmail() == null || firm.getAdminEmail().isEmpty()
