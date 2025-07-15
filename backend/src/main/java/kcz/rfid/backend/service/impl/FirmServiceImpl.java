@@ -2,17 +2,17 @@ package kcz.rfid.backend.service.impl;
 
 import kcz.rfid.backend.exception.ResourceAlreadyExistsException;
 import kcz.rfid.backend.model.dto.FirmRegisterDto;
-import kcz.rfid.backend.model.dto.ForkliftDto;
+import kcz.rfid.backend.model.dto.DeviceDto;
 import kcz.rfid.backend.model.dto.LocationDto;
 import kcz.rfid.backend.model.dto.UserRegisterDto;
 import kcz.rfid.backend.model.entity.FirmEntity;
-import kcz.rfid.backend.model.entity.ForkliftEntity;
+import kcz.rfid.backend.model.entity.DeviceEntity;
 import kcz.rfid.backend.model.entity.LocationEntity;
 import kcz.rfid.backend.model.entity.UserEntity;
 import kcz.rfid.backend.model.repository.EntityRepository;
 import kcz.rfid.backend.model.repository.FirmRepository;
 import kcz.rfid.backend.service.FirmService;
-import kcz.rfid.backend.service.ForkliftService;
+import kcz.rfid.backend.service.DeviceService;
 import kcz.rfid.backend.service.LocationService;
 import kcz.rfid.backend.service.UserService;
 import org.springframework.stereotype.Service;
@@ -25,14 +25,14 @@ public class FirmServiceImpl extends EntityServiceBase<FirmEntity> implements Fi
     private final FirmRepository firmRepository;
     private final UserService userService;
     private final LocationService locationService;
-    private final ForkliftService forkliftService;
+    private final DeviceService deviceService;
 
-    public FirmServiceImpl(EntityRepository<FirmEntity> repository, FirmRepository firmRepository, UserService userService, LocationService locationService, ForkliftService forkliftService) {
+    public FirmServiceImpl(EntityRepository<FirmEntity> repository, FirmRepository firmRepository, UserService userService, LocationService locationService, DeviceService deviceService) {
         super(repository);
         this.firmRepository = firmRepository;
         this.userService = userService;
         this.locationService = locationService;
-        this.forkliftService = forkliftService;
+        this.deviceService = deviceService;
     }
 
     @Override
@@ -79,10 +79,10 @@ public class FirmServiceImpl extends EntityServiceBase<FirmEntity> implements Fi
     }
 
     @Override
-    public ForkliftEntity addForkliftToFirm(FirmEntity firmEntity, ForkliftDto forkliftDto) {
-        ForkliftEntity newForklift = forkliftService.createForklift(forkliftDto, firmEntity);
-        firmEntity.getForklifts().add(newForklift);
+    public DeviceEntity addDeviceToFirm(FirmEntity firmEntity, DeviceDto deviceDto) {
+        DeviceEntity device = deviceService.createForklift(deviceDto, firmEntity);
+        firmEntity.getDevices().add(device);
         firmRepository.save(firmEntity);
-        return newForklift;
+        return device;
     }
 }

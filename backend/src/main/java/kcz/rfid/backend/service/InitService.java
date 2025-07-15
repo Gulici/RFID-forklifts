@@ -19,15 +19,15 @@ public class InitService {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final LocationRepository locationRepository;
-    private final ForkliftRepository forkliftRepository;
+    private final DeviceRepository deviceRepository;
     private final FirmRepository firmRepository;
     private final FirmService firmService;
 
-    public InitService(RoleRepository roleRepository, UserRepository userRepository, LocationRepository locationRepository, ForkliftRepository forkliftRepository, FirmRepository firmRepository, FirmService firmService) {
+    public InitService(RoleRepository roleRepository, UserRepository userRepository, LocationRepository locationRepository, DeviceRepository deviceRepository, FirmRepository firmRepository, FirmService firmService) {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.locationRepository = locationRepository;
-        this.forkliftRepository = forkliftRepository;
+        this.deviceRepository = deviceRepository;
         this.firmRepository = firmRepository;
         this.firmService = firmService;
     }
@@ -97,20 +97,20 @@ public class InitService {
             firm.getLocations().add(location);
             firm.getLocations().add(location2);
 
-            ForkliftEntity forklift = new ForkliftEntity();
+            DeviceEntity forklift = new DeviceEntity();
             forklift.setFirm(firm);
             forklift.setName("FORKLIFT_1");
             forklift.setLocation(location);
 
-            ForkliftEntity forklift2 = new ForkliftEntity();
+            DeviceEntity forklift2 = new DeviceEntity();
             forklift2.setFirm(firm);
             forklift2.setName("FORKLIFT_2");
             forklift2.setLocation(location);
 
-            List<ForkliftEntity> forklifts = new ArrayList<>();
+            List<DeviceEntity> forklifts = new ArrayList<>();
             forklifts.add(forklift);
             forklifts.add(forklift2);
-            firm.setForklifts(forklifts);
+            firm.setDevices(forklifts);
 
             firmRepository.save(firm);
         }

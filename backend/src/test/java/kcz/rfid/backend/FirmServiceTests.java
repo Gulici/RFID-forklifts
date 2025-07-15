@@ -2,11 +2,11 @@ package kcz.rfid.backend;
 
 import kcz.rfid.backend.exception.ResourceAlreadyExistsException;
 import kcz.rfid.backend.model.dto.FirmRegisterDto;
-import kcz.rfid.backend.model.dto.ForkliftDto;
+import kcz.rfid.backend.model.dto.DeviceDto;
 import kcz.rfid.backend.model.dto.LocationDto;
 import kcz.rfid.backend.model.dto.UserRegisterDto;
 import kcz.rfid.backend.model.entity.FirmEntity;
-import kcz.rfid.backend.model.entity.ForkliftEntity;
+import kcz.rfid.backend.model.entity.DeviceEntity;
 import kcz.rfid.backend.model.entity.LocationEntity;
 import kcz.rfid.backend.model.entity.UserEntity;
 import kcz.rfid.backend.model.entity.util.RoleEnum;
@@ -213,13 +213,13 @@ public class FirmServiceTests {
     }
 
     @Test
-    void shouldAddForkliftToFirm() {
+    void shouldAddDeviceToFirm() {
         FirmEntity firm = this.createFirm();
 
-        ForkliftDto forkliftDto = new ForkliftDto();
-        forkliftDto.setName("Forklift");
+        DeviceDto deviceDto = new DeviceDto();
+        deviceDto.setName("Forklift");
 
-        ForkliftEntity forklift =  firmService.addForkliftToFirm(firm, forkliftDto);
+        DeviceEntity forklift =  firmService.addDeviceToFirm(firm, deviceDto);
 
         Assertions.assertNotNull(forklift);
         Assertions.assertEquals("Forklift", forklift.getName());
@@ -227,20 +227,20 @@ public class FirmServiceTests {
     }
 
     @Test
-    void shouldNotAddForkliftToFirm() {
+    void shouldNotAddDeviceToFirm() {
         FirmEntity firm = this.createFirm();
-        ForkliftDto forkliftDto = new ForkliftDto();
-        forkliftDto.setName("Forklift");
-        firmService.addForkliftToFirm(firm, forkliftDto);
+        DeviceDto deviceDto = new DeviceDto();
+        deviceDto.setName("Forklift");
+        firmService.addDeviceToFirm(firm, deviceDto);
 
-        Assertions.assertThrows(ResourceAlreadyExistsException.class, () -> firmService.addForkliftToFirm(firm, forkliftDto));
+        Assertions.assertThrows(ResourceAlreadyExistsException.class, () -> firmService.addDeviceToFirm(firm, deviceDto));
     }
 
     @Test
-    void shouldNotAddForkliftToFirm1() {
+    void shouldNotAddDeviceToFirm1() {
         FirmEntity firm = this.createFirm();
-        ForkliftDto forkliftDto = new ForkliftDto();
-        Assertions.assertThrows(IllegalArgumentException.class, () -> firmService.addForkliftToFirm(firm, forkliftDto));
+        DeviceDto deviceDto = new DeviceDto();
+        Assertions.assertThrows(IllegalArgumentException.class, () -> firmService.addDeviceToFirm(firm, deviceDto));
     }
 
     private FirmEntity createFirm() {

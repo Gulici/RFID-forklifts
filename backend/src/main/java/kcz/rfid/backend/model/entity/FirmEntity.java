@@ -12,7 +12,7 @@ import java.util.List;
 @Table(name = "firms")
 @Getter
 @Setter
-@ToString(exclude = {"users", "locations", "forklifts"})
+@ToString(exclude = {"users", "locations", "devices"})
 public class FirmEntity extends EntityBase {
 
     @Column(nullable = false, unique = true)
@@ -25,5 +25,5 @@ public class FirmEntity extends EntityBase {
     private List<LocationEntity> locations = new ArrayList<>();
 
     @OneToMany(mappedBy = "firm", cascade = CascadeType.ALL)
-    private List<ForkliftEntity> forklifts = new ArrayList<>();
+    private List<DeviceEntity> devices = new ArrayList<>();
 }

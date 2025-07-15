@@ -8,7 +8,7 @@ import java.util.UUID;
 @Data
 public class LocationHistoryDto {
     private UUID id;
-    private ForkliftDto forkliftDto;
+    private DeviceDto deviceDto;
     private LocationDto locationDto;
     private LocalDateTime timestamp;
 }

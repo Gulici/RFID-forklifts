@@ -16,7 +16,7 @@ public class LocationHistoryEntity extends EntityBase{
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "forklift_id", nullable = false)
-    private ForkliftEntity forklift;
+    private DeviceEntity device;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "location_id", nullable = false)

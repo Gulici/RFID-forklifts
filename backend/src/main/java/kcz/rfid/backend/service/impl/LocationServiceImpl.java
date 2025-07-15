@@ -4,7 +4,7 @@ import kcz.rfid.backend.exception.ResourceAlreadyExistsException;
 import kcz.rfid.backend.exception.ResourceNotFoundException;
 import kcz.rfid.backend.model.dto.LocationDto;
 import kcz.rfid.backend.model.entity.FirmEntity;
-import kcz.rfid.backend.model.entity.ForkliftEntity;
+import kcz.rfid.backend.model.entity.DeviceEntity;
 import kcz.rfid.backend.model.entity.LocationEntity;
 import kcz.rfid.backend.model.entity.LocationHistoryEntity;
 import kcz.rfid.backend.model.repository.EntityRepository;
@@ -79,10 +79,10 @@ public class LocationServiceImpl extends EntityServiceBase<LocationEntity> imple
     }
 
     @Override
-    public LocationHistoryEntity createNewLocationHistoryEntry(LocationEntity location, ForkliftEntity forklift) {
+    public LocationHistoryEntity createNewLocationHistoryEntry(LocationEntity location, DeviceEntity device) {
         LocationHistoryEntity locationHistoryEntity = new LocationHistoryEntity();
         locationHistoryEntity.setLocation(location);
-        locationHistoryEntity.setForklift(forklift);
+        locationHistoryEntity.setDevice(device);
         locationHistoryEntity.setTimestamp(LocalDateTime.now());
 
         return locationHistoryRepository.save(locationHistoryEntity);
@@ -94,7 +94,7 @@ public class LocationServiceImpl extends EntityServiceBase<LocationEntity> imple
     }
 
     @Override
-    public List<LocationHistoryEntity> getLocationHistoryForForklift(ForkliftEntity forkliftEntity) {
-        return locationHistoryRepository.findAllByForklift(forkliftEntity);
+    public List<LocationHistoryEntity> getLocationHistoryForForklift(DeviceEntity deviceEntity) {
+        return locationHistoryRepository.findAllByDevice(deviceEntity);
     }
 }

@@ -7,13 +7,12 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "locations")
 @Getter
 @Setter
-@ToString(exclude = {"forklifts", "locationHistoryList", "forklifts"})
+@ToString(exclude = {"devices", "locationHistoryList"})
 public class LocationEntity extends EntityBase {
 
     @Column(nullable = false, unique = true)
@@ -30,7 +29,7 @@ public class LocationEntity extends EntityBase {
     private FirmEntity firm;
 
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
-    private List<ForkliftEntity> forklifts = new ArrayList<>();
+    private List<DeviceEntity> devices = new ArrayList<>();
 
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
     private List<LocationHistoryEntity> locationHistoryList = new ArrayList<>();

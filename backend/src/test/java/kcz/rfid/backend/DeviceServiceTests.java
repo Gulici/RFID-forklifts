@@ -1,15 +1,15 @@
 package kcz.rfid.backend;
 
 import kcz.rfid.backend.model.dto.FirmRegisterDto;
-import kcz.rfid.backend.model.dto.ForkliftDto;
+import kcz.rfid.backend.model.dto.DeviceDto;
 import kcz.rfid.backend.model.dto.LocationDto;
 import kcz.rfid.backend.model.entity.FirmEntity;
-import kcz.rfid.backend.model.entity.ForkliftEntity;
+import kcz.rfid.backend.model.entity.DeviceEntity;
 import kcz.rfid.backend.model.entity.LocationEntity;
 import kcz.rfid.backend.model.entity.LocationHistoryEntity;
 import kcz.rfid.backend.model.repository.*;
 import kcz.rfid.backend.service.FirmService;
-import kcz.rfid.backend.service.ForkliftService;
+import kcz.rfid.backend.service.DeviceService;
 import kcz.rfid.backend.service.LocationService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,23 +22,23 @@ import java.util.List;
 
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
-public class ForkliftServiceTests {
+public class DeviceServiceTests {
 
     @Autowired
     private FirmRepository firmRepository;
     @Autowired
-    private ForkliftRepository forkliftRepository;
+    private DeviceRepository deviceRepository;
     @Autowired
     private LocationHistoryRepository locationHistoryRepository;
     @Autowired
     private LocationRepository locationRepository;
     @Autowired
-    private ForkliftService forkliftService;
+    private DeviceService deviceService;
     @Autowired
     private FirmService firmService;
 
     private FirmEntity firm;
-    private ForkliftEntity forklift;
+    private DeviceEntity forklift;
     private List<LocationEntity> locations;
     @Autowired
     private LocationService locationService;
@@ -46,7 +46,7 @@ public class ForkliftServiceTests {
     @BeforeEach
     public void setUp() {
         locationHistoryRepository.deleteAll();
-        forkliftRepository.deleteAll();
+        deviceRepository.deleteAll();
         locationRepository.deleteAll();
         firmRepository.deleteAll();
 
@@ -64,10 +64,10 @@ public class ForkliftServiceTests {
         return firmService.createFirm(firmRegisterDto);
     }
 
-    private ForkliftEntity createForklift() {
-        ForkliftDto forkliftDto = new ForkliftDto();
-        forkliftDto.setName("Forklift");
-        return firmService.addForkliftToFirm(firm, forkliftDto);
+    private DeviceEntity createForklift() {
+        DeviceDto deviceDto = new DeviceDto();
+        deviceDto.setName("Forklift");
+        return firmService.addDeviceToFirm(firm, deviceDto);
     }
 
     private void addLocationsToFirm() {
@@ -102,9 +102,9 @@ public class ForkliftServiceTests {
     @Test
     public void shouldUpdateLocation() {
         LocationEntity location1 = locations.get(0);
-        forkliftService.updateLocation(forklift, location1);
+        deviceService.updateLocation(forklift, location1);
 
-        ForkliftEntity fFromDb = forkliftRepository.findById(forklift.getId()).orElse(null);
+        DeviceEntity fFromDb = deviceRepository.findById(forklift.getId()).orElse(null);
         Assertions.assertNotNull(fFromDb);
         LocationEntity l1 = forklift.getLocation();
 
@@ -115,18 +115,18 @@ public class ForkliftServiceTests {
         List<LocationHistoryEntity> locationHistory = locationService.getLocationHistoryForFirm(firm);
         Assertions.assertEquals(1, locationHistory.size());
         Assertions.assertEquals(location1, locationHistory.get(0).getLocation());
-        Assertions.assertEquals(forklift, locationHistory.get(0).getForklift());
+        Assertions.assertEquals(forklift, locationHistory.get(0).getDevice());
     }
 
     @Test
     public void shouldWriteAllLocationHistory() {
         for (var location : locations) {
-            forkliftService.updateLocation(forklift, location);
+            deviceService.updateLocation(forklift, location);
         }
 
         List<LocationHistoryEntity> locationHistory = locationService.getLocationHistoryForForklift(forklift);
         List<LocationHistoryEntity> locationHistory2 = locationService.getLocationHistoryForFirm(firm);
-        ForkliftEntity forkliftDb = forkliftRepository.findById(forklift.getId()).orElse(null);
+        DeviceEntity forkliftDb = deviceRepository.findById(forklift.getId()).orElse(null);
         Assertions.assertNotNull(forkliftDb);
 
         Assertions.assertEquals(locations.size(), locationHistory.size());

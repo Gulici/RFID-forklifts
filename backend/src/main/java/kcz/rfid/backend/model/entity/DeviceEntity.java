@@ -9,14 +9,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "forklifts")
+@Table(name = "devices")
 @Getter
 @Setter
 @ToString(exclude = {"locationHistoryList"})
-public class ForkliftEntity extends EntityBase {
+public class DeviceEntity extends EntityBase {
 
     @Column(nullable = false, unique = true)
     private String name;
+
+    @Column(nullable = false, unique = true)
+    private String publicKey;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "firm_id", nullable = false)
@@ -26,6 +29,6 @@ public class ForkliftEntity extends EntityBase {
     @JoinColumn(name = "location_id")
     private LocationEntity location;
 
-    @OneToMany(mappedBy = "forklift", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "device", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<LocationHistoryEntity> locationHistoryList = new ArrayList<>();
 }

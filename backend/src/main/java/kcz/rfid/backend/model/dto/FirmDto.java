@@ -11,5 +11,5 @@ public class FirmDto {
     private String firmName;
     private List<UserDto> users;
     private List<LocationDto> locations;
-    private List<ForkliftDto> forklifts;
+    private List<DeviceDto> devices;
 }

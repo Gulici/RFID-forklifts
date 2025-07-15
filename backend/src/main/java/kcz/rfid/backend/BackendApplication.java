@@ -1,19 +1,9 @@
 package kcz.rfid.backend;
 
-import kcz.rfid.backend.model.entity.*;
-import kcz.rfid.backend.model.entity.util.RoleEnum;
-import kcz.rfid.backend.model.repository.FirmRepository;
-import kcz.rfid.backend.model.repository.ForkliftRepository;
-import kcz.rfid.backend.model.repository.RoleRepository;
-import kcz.rfid.backend.model.repository.UserRepository;
 import kcz.rfid.backend.service.InitService;
-import org.hibernate.Hibernate;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
 
 @SpringBootApplication
 public class BackendApplication implements CommandLineRunner {

@@ -8,11 +8,11 @@ import org.springframework.stereotype.Component;
 public class LocationHistoryMapper implements Mapper<LocationHistoryEntity, LocationHistoryDto> {
 
     private final LocationMapper locationMapper;
-    private final ForkliftMapper forkliftMapper;
+    private final DeviceMapper deviceMapper;
 
-    public LocationHistoryMapper(LocationMapper locationMapper, ForkliftMapper forkliftMapper) {
+    public LocationHistoryMapper(LocationMapper locationMapper, DeviceMapper deviceMapper) {
         this.locationMapper = locationMapper;
-        this.forkliftMapper = forkliftMapper;
+        this.deviceMapper = deviceMapper;
     }
 
     @Override
@@ -20,7 +20,7 @@ public class LocationHistoryMapper implements Mapper<LocationHistoryEntity, Loca
         LocationHistoryDto dto = new LocationHistoryDto();
         dto.setId(locationHistoryEntity.getId());
         dto.setLocationDto(locationMapper.mapToDto(locationHistoryEntity.getLocation()));
-        dto.setForkliftDto(forkliftMapper.mapToDto(locationHistoryEntity.getForklift()));
+        dto.setDeviceDto(deviceMapper.mapToDto(locationHistoryEntity.getDevice()));
         dto.setTimestamp(locationHistoryEntity.getTimestamp());
         return dto;
     }
