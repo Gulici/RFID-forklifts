@@ -11,4 +11,6 @@ public interface DeviceRepository extends EntityRepository<DeviceEntity> {
     Collection<DeviceEntity> findDeviceEntitiesByFirm(FirmEntity firm);
 
     Optional<DeviceEntity> findByPublicKey(String publicKey);
+
+    DeviceEntity findDeviceEntityByPublicKey(String publicKey);
 }

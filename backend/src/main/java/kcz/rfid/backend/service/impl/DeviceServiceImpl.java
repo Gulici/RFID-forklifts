@@ -68,4 +68,9 @@ public class DeviceServiceImpl extends EntityServiceBase<DeviceEntity> implement
     public Collection<DeviceEntity> findDevicesByFirm(FirmEntity firm) {
         return deviceRepository.findDeviceEntitiesByFirm(firm);
     }
+
+    @Override
+    public DeviceEntity findDeviceByPublicKey(String publicKey) {
+        return deviceRepository.findDeviceEntityByPublicKey(publicKey);
+    }
 }

@@ -15,4 +15,6 @@ public interface DeviceService extends EntityService<DeviceEntity> {
     void updateLocation(DeviceEntity device, LocationEntity locationEntity);
 
     Collection<DeviceEntity> findDevicesByFirm(FirmEntity firm);
+
+    DeviceEntity findDeviceByPublicKey(String publicKey);
 }
