@@ -6,5 +6,6 @@ import lombok.Data;
 public class RegisterDeviceDto {
     private String username;
     private String password;
+    private String deviceName;
     private String publicKey;
 }

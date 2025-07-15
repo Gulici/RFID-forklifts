@@ -4,6 +4,7 @@ import kcz.rfid.backend.exception.ResourceAlreadyExistsException;
 import kcz.rfid.backend.model.dto.FirmRegisterDto;
 import kcz.rfid.backend.model.dto.DeviceDto;
 import kcz.rfid.backend.model.dto.LocationDto;
+import kcz.rfid.backend.model.dto.RegisterDeviceDto;
 import kcz.rfid.backend.model.dto.UserRegisterDto;
 import kcz.rfid.backend.model.entity.FirmEntity;
 import kcz.rfid.backend.model.entity.DeviceEntity;
@@ -79,8 +80,8 @@ public class FirmServiceImpl extends EntityServiceBase<FirmEntity> implements Fi
     }
 
     @Override
-    public DeviceEntity addDeviceToFirm(FirmEntity firmEntity, DeviceDto deviceDto) {
-        DeviceEntity device = deviceService.createForklift(deviceDto, firmEntity);
+    public DeviceEntity addDeviceToFirm(FirmEntity firmEntity, RegisterDeviceDto deviceDto) {
+        DeviceEntity device = deviceService.createDevice(deviceDto, firmEntity);
         firmEntity.getDevices().add(device);
         firmRepository.save(firmEntity);
         return device;

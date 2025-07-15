@@ -3,6 +3,7 @@ package kcz.rfid.backend.service.impl;
 import kcz.rfid.backend.exception.ResourceAlreadyExistsException;
 import kcz.rfid.backend.exception.ResourceNotFoundException;
 import kcz.rfid.backend.model.dto.DeviceDto;
+import kcz.rfid.backend.model.dto.RegisterDeviceDto;
 import kcz.rfid.backend.model.entity.FirmEntity;
 import kcz.rfid.backend.model.entity.DeviceEntity;
 import kcz.rfid.backend.model.entity.LocationEntity;
@@ -28,19 +29,21 @@ public class DeviceServiceImpl extends EntityServiceBase<DeviceEntity> implement
     }
 
     @Override
-    public DeviceEntity createForklift(DeviceDto deviceDto, FirmEntity firmEntity) {
-        if (deviceDto.getName() == null || deviceDto.getName().isEmpty()) {
-            throw new IllegalArgumentException("DeviceDto cannot have null or empty values");
+    public DeviceEntity createDevice(RegisterDeviceDto deviceDto, FirmEntity firmEntity) {
+
+        if (deviceRepository.findByPublicKey(deviceDto.getPublicKey()).isPresent()) {
+            throw new ResourceAlreadyExistsException("Device already exists");
+        }
+        if (deviceRepository.findByName(deviceDto.getDeviceName()).isPresent()) {
+            throw new ResourceAlreadyExistsException("Device with name " + deviceDto.getDeviceName() + " already exists");
         }
 
-        if (deviceRepository.findByName(deviceDto.getName()).isPresent()) {
-            throw new ResourceAlreadyExistsException("Device with name " + deviceDto.getName() + " already exists");
-        }
-        DeviceEntity deviceEntity = new DeviceEntity();
-        deviceEntity.setName(deviceDto.getName());
-        deviceEntity.setFirm(firmEntity);
+        DeviceEntity device = new DeviceEntity();
+        device.setPublicKey(deviceDto.getPublicKey());
+        device.setFirm(firmEntity);
+        device.setName(deviceDto.getDeviceName());
 
-        return deviceRepository.save(deviceEntity);
+        return deviceRepository.save(device);
     }
 
     @Override
