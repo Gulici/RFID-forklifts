@@ -41,7 +41,7 @@ public class DeviceController {
     }
 
     @PostMapping
-    public ResponseEntity<DeviceDto> createDevice(@RequestBody RegisterDeviceDto registerDto) {
+    public ResponseEntity<DeviceDto> registerDevice(@RequestBody RegisterDeviceDto registerDto) {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(registerDto.getUsername(), registerDto.getPassword())
         );
@@ -49,6 +49,7 @@ public class DeviceController {
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"))) {
             UserEntity admin = userService.findUserByUsername(registerDto.getUsername());
             DeviceEntity device = firmService.addDeviceToFirm(admin.getFirm(), registerDto);
+            return new ResponseEntity<>(deviceMapper.mapToDto(device), HttpStatus.CREATED);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -84,4 +85,34 @@ public class DeviceController {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<DeviceDto> updateDevice(@RequestBody String deviceName, @AuthenticationPrincipal UserDetails userDetails, @PathVariable UUID id) {
+        if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+            UserEntity admin = userService.findUserByUsername(userDetails.getUsername());
+            DeviceEntity device = deviceService.findById(id);
+
+            if(!device.getFirm().equals(admin.getFirm())) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+
+            device.setName(deviceName);
+            deviceService.save(device);
+            return new ResponseEntity<>(deviceMapper.mapToDto(device), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<DeviceDto> deleteDevice(@PathVariable UUID id, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+            UserEntity admin = userService.findUserByUsername(userDetails.getUsername());
+            DeviceEntity device = deviceService.findById(id);
+
+            if(!device.getFirm().equals(admin.getFirm())) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+            deviceService.delete(device);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
 }
