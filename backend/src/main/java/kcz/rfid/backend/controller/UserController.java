@@ -1,6 +1,7 @@
 package kcz.rfid.backend.controller;
 
 import jakarta.validation.Valid;
+import kcz.rfid.backend.exception.ResourceNotFoundException;
 import kcz.rfid.backend.model.dto.UserDto;
 import kcz.rfid.backend.model.dto.UserRegisterDto;
 import kcz.rfid.backend.model.entity.FirmEntity;
@@ -58,6 +59,9 @@ public class UserController {
         }
         UserEntity user = userService.findUserByUsername(userDetails.getUsername());
         UserEntity requestedUser= userService.findById(id);
+        if (requestedUser == null) {
+            throw new ResourceNotFoundException("User with id " + id + " not found");
+        }
 
         if (user.getId().equals(requestedUser.getId()) ||
                 userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ROOT"))) {
@@ -78,6 +82,9 @@ public class UserController {
         }
         if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ROOT"))) {
             FirmEntity firmEntity = firmService.findById(id);
+            if (firmEntity == null) {
+                throw new ResourceNotFoundException("Firm with id " + id + " not found");
+            }
             List<UserEntity> users = userService.findUsersByFirm(firmEntity);
             return new ResponseEntity<>(users.stream().map(userMapper::mapToDto).toList(), HttpStatus.OK);
         }
@@ -123,7 +130,7 @@ public class UserController {
         if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
             UserEntity user = userService.findById(id);
             if (user == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                throw new ResourceNotFoundException("User with id " + id + " not found");
             }
             UserEntity admin = userService.findUserByUsername(userDetails.getUsername());
             if (admin.getFirm().equals(user.getFirm()) && !admin.equals(user)) {

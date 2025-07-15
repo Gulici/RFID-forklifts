@@ -1,9 +1,6 @@
 package kcz.rfid.backend.service;
 
-import kcz.rfid.backend.model.dto.FirmRegisterDto;
-import kcz.rfid.backend.model.dto.LocationDto;
-import kcz.rfid.backend.model.dto.RegisterDeviceDto;
-import kcz.rfid.backend.model.dto.UserRegisterDto;
+import kcz.rfid.backend.model.dto.*;
 import kcz.rfid.backend.model.entity.FirmEntity;
 import kcz.rfid.backend.model.entity.DeviceEntity;
 import kcz.rfid.backend.model.entity.LocationEntity;
@@ -14,4 +11,8 @@ public interface FirmService extends EntityService<FirmEntity> {
     UserEntity addUserToFirm(FirmEntity firmEntity, UserRegisterDto userRegisterDto);
     LocationEntity addLocationToFirm(FirmEntity firmEntity, LocationDto locationDto);
     DeviceEntity addDeviceToFirm(FirmEntity firmEntity, RegisterDeviceDto deviceDto);
+
+    FirmEntity updateFirm(FirmEntity firm, FirmDto dto);
+
+    void updateDeviceLocation(DeviceLocationDto dto);
 }

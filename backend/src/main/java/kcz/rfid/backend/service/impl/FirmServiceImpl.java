@@ -1,11 +1,8 @@
 package kcz.rfid.backend.service.impl;
 
 import kcz.rfid.backend.exception.ResourceAlreadyExistsException;
-import kcz.rfid.backend.model.dto.FirmRegisterDto;
-import kcz.rfid.backend.model.dto.DeviceDto;
-import kcz.rfid.backend.model.dto.LocationDto;
-import kcz.rfid.backend.model.dto.RegisterDeviceDto;
-import kcz.rfid.backend.model.dto.UserRegisterDto;
+import kcz.rfid.backend.exception.ResourceNotFoundException;
+import kcz.rfid.backend.model.dto.*;
 import kcz.rfid.backend.model.entity.FirmEntity;
 import kcz.rfid.backend.model.entity.DeviceEntity;
 import kcz.rfid.backend.model.entity.LocationEntity;
@@ -85,5 +82,37 @@ public class FirmServiceImpl extends EntityServiceBase<FirmEntity> implements Fi
         firmEntity.getDevices().add(device);
         firmRepository.save(firmEntity);
         return device;
+    }
+
+    @Override
+    public FirmEntity updateFirm(FirmEntity firm, FirmDto dto) {
+        if (firmRepository.findByFirmName(dto.getFirmName()).isPresent()) {
+            throw new ResourceAlreadyExistsException("Firm with name " + dto.getFirmName() + " already exists");
+        }
+        firm.setFirmName(dto.getFirmName());
+        return firmRepository.save(firm);
+    }
+
+    @Override
+    public void updateDeviceLocation(DeviceLocationDto dto) {
+        FirmEntity firm = firmRepository.findFirmEntityById(dto.getFirmId());
+        if (firm == null) {
+            throw new ResourceNotFoundException("Firm with id " + dto.getFirmId() + " not found");
+        }
+
+        String zoneIdHex = dto.getEpcCode().substring(4,6);
+        int zoneId = Integer.parseInt(zoneIdHex, 16);
+
+        LocationEntity location = locationService.getLocationByFirmAndZoneId(firm, zoneId);
+        if (location == null) {
+            throw new ResourceNotFoundException("Location " + zoneIdHex + " for firm " + firm.getFirmName() + " not found");
+        }
+
+        DeviceEntity device = deviceService.findById(dto.getId());
+        if (device == null) {
+            throw new ResourceNotFoundException("Device with id " + dto.getId() + " not found");
+        }
+
+        deviceService.updateLocation(device, location);
     }
 }

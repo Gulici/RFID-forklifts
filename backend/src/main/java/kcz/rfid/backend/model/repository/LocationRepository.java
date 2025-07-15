@@ -1,5 +1,6 @@
 package kcz.rfid.backend.model.repository;
 
+import kcz.rfid.backend.model.entity.FirmEntity;
 import kcz.rfid.backend.model.entity.LocationEntity;
 
 import java.util.List;
@@ -10,4 +11,7 @@ public interface LocationRepository extends EntityRepository<LocationEntity> {
     Optional<LocationEntity> findByName(String name);
     Optional<LocationEntity> findByZoneId(int zoneId);
     List<LocationEntity> findAllByFirmId(UUID firm_id);
+    List<LocationEntity> findAllByFirm(FirmEntity firm);
+
+    LocationEntity findByFirmAndZoneId(FirmEntity firm, int zoneId);
 }

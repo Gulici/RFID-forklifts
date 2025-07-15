@@ -12,6 +12,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Component
@@ -22,7 +23,17 @@ public class JwtService {
 
     public String generateToken(String email) {
         Map<String, Object> claims = new HashMap<String, Object>();
+        claims.put("type", "user");
         return createToken(claims,email);
+    }
+
+    public String generateDeviceToken(UUID deviceId, UUID companyId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("deviceId", deviceId.toString());
+        claims.put("companyId", companyId.toString());
+        claims.put("type", "device");
+
+        return createToken(claims, deviceId.toString());
     }
 
     private String createToken(Map<String, Object> claims, String email) {
@@ -34,6 +45,7 @@ public class JwtService {
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
 
     private Key getSignKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET);
@@ -61,12 +73,33 @@ public class JwtService {
                 .getBody();
     }
 
+
+    public UUID extractDeviceId(String token) {
+        return UUID.fromString((String) extractAllClaims(token).get("deviceId"));
+    }
+
+    public UUID extractCompanyId(String token) {
+        return UUID.fromString((String) extractAllClaims(token).get("companyId"));
+    }
+
+    public String extractTokenType(String token) {
+        return (String) extractAllClaims(token).get("type");
+    }
+
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
+    public Boolean validateUserToken(String token, UserDetails userDetails) {
         final String username = this.extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return extractTokenType(token).equals("user")
+                && username.equals(userDetails.getUsername())
+                && !isTokenExpired(token);
+    }
+
+    public boolean validateDeviceToken(String token, UUID expectedDeviceId) {
+        return extractTokenType(token).equals("device")
+                && extractDeviceId(token).equals(expectedDeviceId)
+                && !isTokenExpired(token);
     }
 }

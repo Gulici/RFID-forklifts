@@ -14,8 +14,10 @@ public interface LocationService extends EntityService<LocationEntity> {
     LocationEntity updateLocation(LocationDto locationDto, UUID locationId);
 
     LocationHistoryEntity createNewLocationHistoryEntry(LocationEntity location, DeviceEntity forklift);
-
+    List<LocationEntity> getLocationsByFirm(FirmEntity firmEntity);
     List<LocationHistoryEntity> getLocationHistoryForFirm(FirmEntity firmEntity);
     List<LocationHistoryEntity> getLocationHistoryForForklift(DeviceEntity deviceEntity);
 
+
+    LocationEntity getLocationByFirmAndZoneId(FirmEntity firm, int zoneId);
 }

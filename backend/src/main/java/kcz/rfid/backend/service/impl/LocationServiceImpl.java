@@ -89,6 +89,11 @@ public class LocationServiceImpl extends EntityServiceBase<LocationEntity> imple
     }
 
     @Override
+    public List<LocationEntity> getLocationsByFirm(FirmEntity firmEntity) {
+        return locationRepository.findAllByFirm(firmEntity);
+    }
+
+    @Override
     public List<LocationHistoryEntity> getLocationHistoryForFirm(FirmEntity firm) {
         return locationHistoryRepository.findAllByFirm(firm);
     }
@@ -96,5 +101,10 @@ public class LocationServiceImpl extends EntityServiceBase<LocationEntity> imple
     @Override
     public List<LocationHistoryEntity> getLocationHistoryForForklift(DeviceEntity deviceEntity) {
         return locationHistoryRepository.findAllByDevice(deviceEntity);
+    }
+
+    @Override
+    public LocationEntity getLocationByFirmAndZoneId(FirmEntity firm, int zoneId) {
+        return locationRepository.findByFirmAndZoneId(firm, zoneId);
     }
 }
