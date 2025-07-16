@@ -15,6 +15,12 @@ spring:
         default_schema: public
     hibernate:
       ddl-auto: update
+  data:
+    redis:
+      host: localhost
+      client-type: lettuce
+      port: 6379
+
 
 server:
   port: 8080

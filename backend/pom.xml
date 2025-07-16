@@ -51,6 +51,10 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.thymeleaf.extras</groupId>
             <artifactId>thymeleaf-extras-springsecurity6</artifactId>
         </dependency>
@@ -75,20 +79,6 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>${jjwt.version}</version>
         </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>com.querydsl</groupId>-->
-<!--            <artifactId>querydsl-apt</artifactId>-->
-<!--            <version>${querydsl.version}</version>-->
-<!--            <scope>provided</scope>-->
-<!--            <classifier>jakarta</classifier>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.querydsl</groupId>-->
-<!--            <artifactId>querydsl-jpa</artifactId>-->
-<!--            <version>${querydsl.version}</version>-->
-<!--            <classifier>jakarta</classifier>-->
-<!--        </dependency>-->
 
         <dependency>
             <groupId>org.postgresql</groupId>
