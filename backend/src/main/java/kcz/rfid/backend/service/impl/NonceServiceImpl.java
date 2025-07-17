@@ -26,7 +26,7 @@ public class NonceServiceImpl implements NonceService {
     public String generateAndSaveNonce(UUID deviceId) {
         String nonce = generateNonce();
         String key = generateKey(deviceId);
-        stringRedisTemplate.opsForValue().set(key, nonce,NONCE_TTL_MINUTES, TimeUnit.MINUTES);
+        stringRedisTemplate.opsForValue().set(key, nonce, NONCE_TTL_MINUTES, TimeUnit.MINUTES);
         return nonce;
     }
 
@@ -37,16 +37,15 @@ public class NonceServiceImpl implements NonceService {
     }
 
     @Override
-    public boolean verifyNonce(String nonce, UUID deviceId) {
-        String key = generateKey(deviceId);
-        String value = stringRedisTemplate.opsForValue().get(key);
-        return nonce.equals(value);
-    }
-
-    @Override
     public void deleteNonce(UUID deviceId) {
         String key = generateKey(deviceId);
         stringRedisTemplate.delete(key);
+    }
+
+    @Override
+    public String getStoredNonce(UUID deviceId) {
+        String key = generateKey(deviceId);
+        return stringRedisTemplate.opsForValue().get(key);
     }
 
     private String generateKey(UUID deviceId) {

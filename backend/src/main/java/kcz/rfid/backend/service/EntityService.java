@@ -3,11 +3,12 @@ package kcz.rfid.backend.service;
 import kcz.rfid.backend.model.entity.EntityBase;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface EntityService <E extends EntityBase>{
 
-    E findById(UUID id);
+    Optional<E> findById(UUID id);
 
     Collection<E> getAll();
 

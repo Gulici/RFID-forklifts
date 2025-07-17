@@ -3,7 +3,7 @@ package kcz.rfid.backend.service.impl;
 import kcz.rfid.backend.exception.ResourceAlreadyExistsException;
 import kcz.rfid.backend.exception.ResourceNotFoundException;
 import kcz.rfid.backend.model.dto.DeviceDto;
-import kcz.rfid.backend.model.dto.RegisterDeviceDto;
+import kcz.rfid.backend.model.dto.DeviceRegisterDto;
 import kcz.rfid.backend.model.entity.FirmEntity;
 import kcz.rfid.backend.model.entity.DeviceEntity;
 import kcz.rfid.backend.model.entity.LocationEntity;
@@ -11,7 +11,10 @@ import kcz.rfid.backend.model.repository.EntityRepository;
 import kcz.rfid.backend.model.repository.DeviceRepository;
 import kcz.rfid.backend.service.DeviceService;
 import kcz.rfid.backend.service.LocationService;
+import kcz.rfid.backend.service.utils.PemUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -29,7 +32,7 @@ public class DeviceServiceImpl extends EntityServiceBase<DeviceEntity> implement
     }
 
     @Override
-    public DeviceEntity createDevice(RegisterDeviceDto deviceDto, FirmEntity firmEntity) {
+    public DeviceEntity createDevice(DeviceRegisterDto deviceDto, FirmEntity firmEntity) {
 
         if (deviceRepository.findByPublicKey(deviceDto.getPublicKey()).isPresent()) {
             throw new ResourceAlreadyExistsException("Device already exists");
@@ -40,6 +43,7 @@ public class DeviceServiceImpl extends EntityServiceBase<DeviceEntity> implement
 
         DeviceEntity device = new DeviceEntity();
         device.setPublicKey(deviceDto.getPublicKey());
+        device.setFingerprint(PemUtils.computeFingerprint(deviceDto.getPublicKey()));
         device.setFirm(firmEntity);
         device.setName(deviceDto.getDeviceName());
 
@@ -70,7 +74,9 @@ public class DeviceServiceImpl extends EntityServiceBase<DeviceEntity> implement
     }
 
     @Override
-    public DeviceEntity findDeviceByPublicKey(String publicKey) {
-        return deviceRepository.findDeviceEntityByPublicKey(publicKey);
+    public DeviceEntity findDeviceByFingerprint(String fingerprint) {
+        return deviceRepository.findByFingerprint(fingerprint).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid public key")
+        );
     }
 }

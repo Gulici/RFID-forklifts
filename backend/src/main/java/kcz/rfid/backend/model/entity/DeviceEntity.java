@@ -19,7 +19,11 @@ public class DeviceEntity extends EntityBase {
     private String name;
 
     @Column(nullable = false, unique = true)
+    @Lob
     private String publicKey;
+
+    @Column(nullable = false, unique = true)
+    private String fingerprint;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "firm_id", nullable = false)

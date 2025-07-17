@@ -6,6 +6,7 @@ import kcz.rfid.backend.service.EntityService;
 import lombok.Getter;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 
 @Getter
@@ -18,8 +19,8 @@ public class EntityServiceBase<E extends EntityBase> implements EntityService<E>
     }
 
     @Override
-    public E findById(UUID id) {
-        return repository.findById(id).orElse(null);
+    public Optional<E> findById(UUID id) {
+        return repository.findById(id);
     }
 
     @Override

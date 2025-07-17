@@ -10,7 +10,7 @@ public interface FirmService extends EntityService<FirmEntity> {
     FirmEntity createFirm(FirmRegisterDto firm);
     UserEntity addUserToFirm(FirmEntity firmEntity, UserRegisterDto userRegisterDto);
     LocationEntity addLocationToFirm(FirmEntity firmEntity, LocationDto locationDto);
-    DeviceEntity addDeviceToFirm(FirmEntity firmEntity, RegisterDeviceDto deviceDto);
+    DeviceEntity addDeviceToFirm(FirmEntity firmEntity, DeviceRegisterDto deviceDto);
 
     FirmEntity updateFirm(FirmEntity firm, FirmDto dto);
 

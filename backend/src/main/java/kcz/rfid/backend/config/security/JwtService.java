@@ -7,6 +7,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
@@ -15,7 +16,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
-@Component
+@Service
 public class JwtService {
     // development version
     public static final String SECRET = "w4p9Y8Yb6fJk3RbT4aQ2hMnm5G9ZsXvP1tQ8Xk2L3Ug=";
@@ -23,7 +24,7 @@ public class JwtService {
 
     public String generateToken(String email) {
         Map<String, Object> claims = new HashMap<String, Object>();
-        claims.put("type", "user");
+        claims.put("type", TokenType.USER.toString());
         return createToken(claims,email);
     }
 
@@ -31,15 +32,15 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("deviceId", deviceId.toString());
         claims.put("companyId", companyId.toString());
-        claims.put("type", "device");
+        claims.put("type", TokenType.DEVICE.toString());
 
         return createToken(claims, deviceId.toString());
     }
 
-    private String createToken(Map<String, Object> claims, String email) {
+    private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(email)
+                .setSubject(subject)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
@@ -86,20 +87,20 @@ public class JwtService {
         return (String) extractAllClaims(token).get("type");
     }
 
-    private Boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    private boolean isTokenExpired(String token) {
+        return !extractExpiration(token).before(new Date());
     }
 
     public Boolean validateUserToken(String token, UserDetails userDetails) {
         final String username = this.extractUsername(token);
-        return extractTokenType(token).equals("user")
+        return extractTokenType(token).equals(TokenType.USER.toString())
                 && username.equals(userDetails.getUsername())
-                && !isTokenExpired(token);
+                && isTokenExpired(token);
     }
 
     public boolean validateDeviceToken(String token, UUID expectedDeviceId) {
-        return extractTokenType(token).equals("device")
+        return extractTokenType(token).equals(TokenType.DEVICE.toString())
                 && extractDeviceId(token).equals(expectedDeviceId)
-                && !isTokenExpired(token);
+                && isTokenExpired(token);
     }
 }

@@ -3,16 +3,17 @@ package kcz.rfid.backend.controller;
 import kcz.rfid.backend.exception.ResourceNotFoundException;
 import kcz.rfid.backend.model.dto.FirmDto;
 import kcz.rfid.backend.model.dto.FirmRegisterDto;
+import kcz.rfid.backend.model.dto.UserDto;
 import kcz.rfid.backend.model.entity.FirmEntity;
 import kcz.rfid.backend.model.entity.UserEntity;
 import kcz.rfid.backend.model.mapper.FirmMapper;
+import kcz.rfid.backend.model.mapper.UserMapper;
 import kcz.rfid.backend.service.FirmService;
 import kcz.rfid.backend.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -21,67 +22,47 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/firms")
+@RequiredArgsConstructor
 public class FirmController {
     private final FirmService firmService;
     private final FirmMapper firmMapper;
     private final UserService userService;
-
-    public FirmController(FirmService firmService, FirmMapper firmMapper, UserService userService) {
-        this.firmService = firmService;
-        this.firmMapper = firmMapper;
-        this.userService = userService;
-    }
+    private final UserMapper userMapper;
 
     @PostMapping
-    public ResponseEntity<FirmEntity> createFirm(@RequestBody FirmRegisterDto dto, @AuthenticationPrincipal UserDetails userDetails) {
-        if (!userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ROOT"))) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+    @PreAuthorize("hasRole('ROOT')")
+    public ResponseEntity<FirmEntity> createFirm(@RequestBody FirmRegisterDto dto) {
         FirmEntity firm = firmService.createFirm(dto);
         return new ResponseEntity<>(firm, HttpStatus.CREATED);
     }
 
     @GetMapping()
-    public ResponseEntity<List<FirmDto>> getAllFirms(@AuthenticationPrincipal UserDetails userDetails) {
-        if (!userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ROOT"))) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+    @PreAuthorize("hasRole('ROOT')")
+    public ResponseEntity<List<FirmDto>> getAllFirms() {
         Collection<FirmEntity> firms = firmService.getAll();
         return new ResponseEntity<>(firms.stream().map(firmMapper::mapToDto).toList(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FirmDto> getFirmById(@PathVariable UUID id, @AuthenticationPrincipal UserDetails userDetails) {
-        FirmEntity firm = firmService.findById(id);
-        if (firm == null) {
-            throw new ResourceNotFoundException("Firm with id " + id + " not found");
-        }
-        if (!userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ROOT"))) {
-            UserEntity user = userService.findUserByUsername(userDetails.getUsername());
-            if (user.getFirm().equals(firm)) {
-                return new ResponseEntity<>(firmMapper.mapToDto(firm), HttpStatus.OK);
-            }
-            else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        return new ResponseEntity<>(firmMapper.mapToDto(firm), HttpStatus.OK);
+    @PreAuthorize("hasRole('ROOT') or @securityService.isUserOfFirm(authentication.principal, #id)")
+    public ResponseEntity<FirmDto> getFirmById(@PathVariable UUID id) {
+        FirmEntity firm = firmService.findById(id).orElseThrow(() -> new ResourceNotFoundException("Firm with id " + id + " not found"));
+        return ResponseEntity.ok(firmMapper.mapToDto(firm));
+    }
+
+    @GetMapping("/{id}/users")
+    @PreAuthorize("hasRole('ROOT') or @securityService.isAdminOfFirm(authentication.principal, #id)")
+    public ResponseEntity<List<UserDto>> geFirmUsers(@PathVariable UUID id) {
+        FirmEntity firm = firmService.findById(id).orElseThrow(() -> new ResourceNotFoundException("Firm with id " + id + " not found"));
+        List<UserEntity> users = userService.findUsersByFirm(firm);
+        return ResponseEntity.ok(users.stream().map(userMapper::mapToDto).toList());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<FirmDto> updateFirm(@PathVariable UUID id, @RequestBody FirmDto dto, @AuthenticationPrincipal UserDetails userDetails) {
-        FirmEntity firm = firmService.findById(id);
-        if (firm == null) {
-            throw new ResourceNotFoundException("Firm with id " + id + " not found");
-        }
-        if (userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
-            UserEntity admin = userService.findUserByUsername(userDetails.getUsername());
-            if (admin.getFirm().equals(firm)) {
-                firm = firmService.updateFirm(firm, dto);
-                return new ResponseEntity<>(firmMapper.mapToDto(firm), HttpStatus.OK);
-            }
-            else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
+    @PreAuthorize("hasRole('ROOT') or @securityService.isAdminOfFirm(authentication.principal, #id)")
+    public ResponseEntity<FirmDto> updateFirm(@PathVariable UUID id, @RequestBody FirmDto dto) {
+        FirmEntity firm = firmService.findById(id).orElseThrow(() -> new ResourceNotFoundException("Firm with id " + id + " not found"));
         firm = firmService.updateFirm(firm, dto);
-        return new ResponseEntity<>(firmMapper.mapToDto(firm), HttpStatus.OK);
+        return ResponseEntity.ok(firmMapper.mapToDto(firm));
     }
 }

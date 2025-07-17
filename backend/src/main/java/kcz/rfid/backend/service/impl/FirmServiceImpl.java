@@ -77,7 +77,7 @@ public class FirmServiceImpl extends EntityServiceBase<FirmEntity> implements Fi
     }
 
     @Override
-    public DeviceEntity addDeviceToFirm(FirmEntity firmEntity, RegisterDeviceDto deviceDto) {
+    public DeviceEntity addDeviceToFirm(FirmEntity firmEntity, DeviceRegisterDto deviceDto) {
         DeviceEntity device = deviceService.createDevice(deviceDto, firmEntity);
         firmEntity.getDevices().add(device);
         firmRepository.save(firmEntity);
@@ -108,10 +108,9 @@ public class FirmServiceImpl extends EntityServiceBase<FirmEntity> implements Fi
             throw new ResourceNotFoundException("Location " + zoneIdHex + " for firm " + firm.getFirmName() + " not found");
         }
 
-        DeviceEntity device = deviceService.findById(dto.getId());
-        if (device == null) {
-            throw new ResourceNotFoundException("Device with id " + dto.getId() + " not found");
-        }
+        DeviceEntity device = deviceService.findById(dto.getId()).orElseThrow(
+                () -> new ResourceNotFoundException("Device with id " + dto.getId() + " not found")
+        );
 
         deviceService.updateLocation(device, location);
     }
