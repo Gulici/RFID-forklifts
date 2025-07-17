@@ -26,11 +26,7 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
-
-    @Bean
-    public org.springframework.security.crypto.password.PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    private final PasswordEncoder passwordEncoder;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration conf) throws Exception {
@@ -40,7 +36,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
 
