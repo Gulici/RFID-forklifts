@@ -32,6 +32,6 @@ public class UserEntity extends EntityBase {
     private Set<RoleEntity> roles = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "firm_id", nullable = false)
+    @JoinColumn(name = "firm_id")
     private FirmEntity firm;
 }

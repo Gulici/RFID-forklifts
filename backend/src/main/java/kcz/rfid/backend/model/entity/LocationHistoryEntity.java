@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class LocationHistoryEntity extends EntityBase{
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "forklift_id", nullable = false)
+    @JoinColumn(name = "device_id", nullable = false)
     private DeviceEntity device;
 
     @ManyToOne(fetch = FetchType.EAGER)
