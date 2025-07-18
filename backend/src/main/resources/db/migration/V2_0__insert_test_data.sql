@@ -2,6 +2,7 @@ insert into firms (id, firm_name) values
     ('00000000-0000-0000-0000-000000000004', 'test-firm1'),
     ('00000000-0000-0000-0000-000000000005', 'test-firm2');
 
+-- password: password
 insert into users (firm_id, id, email, password, username) values
     (null, '00000000-0000-0000-0000-000000000006', 'root@test.com',
      '$2a$12$6.ge.SE6wVaRC.727oHcRewQcSWhDSQUR10b9OboJ6dPi2VrMTKy2', 'root'),

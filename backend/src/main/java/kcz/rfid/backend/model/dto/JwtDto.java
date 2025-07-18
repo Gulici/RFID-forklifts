@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class JwtDto {
-    String jwt;
+    private String jwt;
 
     public JwtDto(String jwt) {
         this.jwt = jwt;

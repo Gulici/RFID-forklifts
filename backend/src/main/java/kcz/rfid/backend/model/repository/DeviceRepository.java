@@ -10,9 +10,9 @@ public interface DeviceRepository extends EntityRepository<DeviceEntity> {
     Optional<DeviceEntity> findByName(String name);
     Collection<DeviceEntity> findDeviceEntitiesByFirm(FirmEntity firm);
 
-    Optional<DeviceEntity> findByPublicKey(String publicKey);
+//    Optional<DeviceEntity> findByPublicKey(String publicKey);
 
-    DeviceEntity findDeviceEntityByPublicKey(String publicKey);
+//    DeviceEntity findDeviceEntityByPublicKey(String publicKey);
 
     Optional<DeviceEntity> findByFingerprint(String fingerprint);
 }

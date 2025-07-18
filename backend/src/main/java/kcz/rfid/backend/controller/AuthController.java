@@ -6,6 +6,7 @@ import kcz.rfid.backend.model.entity.DeviceEntity;
 import kcz.rfid.backend.service.DeviceAuthService;
 import kcz.rfid.backend.service.DeviceService;
 import kcz.rfid.backend.service.NonceService;
+import kcz.rfid.backend.service.utils.PemUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,8 @@ public class AuthController {
 
     @PostMapping("/request-nonce")
     public ResponseEntity<NonceResponse> nonceRequest(@RequestBody NonceRequest request) {
-        DeviceEntity device = deviceService.findDeviceByFingerprint(request.getPublicKeyPem());
+        String fingerprint = PemUtils.computeFingerprint(request.getPublicKeyPem());
+        DeviceEntity device = deviceService.findDeviceByFingerprint(fingerprint);
         if (device == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Device not found");
         }

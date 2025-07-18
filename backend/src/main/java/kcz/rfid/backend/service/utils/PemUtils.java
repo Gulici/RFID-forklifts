@@ -2,6 +2,7 @@ package kcz.rfid.backend.service.utils;
 
 import java.security.KeyFactory;
 import java.security.MessageDigest;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
@@ -28,5 +29,20 @@ public class PemUtils {
         } catch (Exception e) {
             throw new RuntimeException("Could not compute fingerprint", e);
         }
+    }
+
+    public static String getPemPublicKey(PublicKey publicKey) {
+        byte[] encoded = publicKey.getEncoded();
+        return  "-----BEGIN PUBLIC KEY-----\n" +
+                Base64.getMimeEncoder(64, "\n".getBytes()).encodeToString(encoded) +
+                "\n-----END PUBLIC KEY-----";
+
+    }
+
+    public static String getPemPrivateKey(PrivateKey privateKey) {
+        byte[] encoded = privateKey.getEncoded();
+        return  "-----BEGIN PRIVATE KEY-----\n" +
+                Base64.getMimeEncoder(64, "\n".getBytes()).encodeToString(encoded) +
+                "\n-----END PRIVATE KEY-----";
     }
 }

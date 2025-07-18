@@ -18,7 +18,8 @@ public class DeviceMapper implements Mapper<DeviceEntity, DeviceDto> {
         DeviceDto dto = new DeviceDto();
         dto.setId(device.getId());
         dto.setName(device.getName());
-        dto.setLocation(locationMapper.mapToDto(device.getLocation()));
+        if (device.getLocation() != null)
+            dto.setLocation(locationMapper.mapToDto(device.getLocation()));
         return dto;
     }
 }

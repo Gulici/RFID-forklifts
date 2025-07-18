@@ -34,7 +34,7 @@ public class DeviceServiceImpl extends EntityServiceBase<DeviceEntity> implement
     @Override
     public DeviceEntity createDevice(DeviceRegisterDto deviceDto, FirmEntity firmEntity) {
 
-        if (deviceRepository.findByPublicKey(deviceDto.getPublicKey()).isPresent()) {
+        if (deviceRepository.findByFingerprint(PemUtils.computeFingerprint(deviceDto.getPublicKey())).isPresent()) {
             throw new ResourceAlreadyExistsException("Device already exists");
         }
         if (deviceRepository.findByName(deviceDto.getDeviceName()).isPresent()) {
@@ -42,7 +42,7 @@ public class DeviceServiceImpl extends EntityServiceBase<DeviceEntity> implement
         }
 
         DeviceEntity device = new DeviceEntity();
-        device.setPublicKey(deviceDto.getPublicKey());
+//        device.setPublicKey(deviceDto.getPublicKey());
         device.setFingerprint(PemUtils.computeFingerprint(deviceDto.getPublicKey()));
         device.setFirm(firmEntity);
         device.setName(deviceDto.getDeviceName());

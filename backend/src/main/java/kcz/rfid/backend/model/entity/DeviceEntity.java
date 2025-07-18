@@ -18,9 +18,9 @@ public class DeviceEntity extends EntityBase {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false, unique = true)
-    @Lob
-    private String publicKey;
+//    @Column(nullable = false, unique = true)
+//    @Lob
+//    private String publicKey;
 
     @Column(nullable = false, unique = true)
     private String fingerprint;
