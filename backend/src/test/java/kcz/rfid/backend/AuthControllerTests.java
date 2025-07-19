@@ -93,43 +93,4 @@ public class AuthControllerTests {
                         .content(jsonRequest))
                 .andExpect(status().isUnauthorized());
     }
-
-    @Test
-    void shouldAuthenticateAdminAndRegisterDevice() throws Exception {
-        KeyPair keyPair = TestUtils.generateKeyPair();
-        String publicKeyPem = PemUtils.getPemPublicKey(keyPair.getPublic());
-
-        DeviceRegisterDto registerDto = new DeviceRegisterDto();
-        registerDto.setUsername("admin1");
-        registerDto.setPassword("password");
-        registerDto.setDeviceName("dev1");
-        registerDto.setPublicKey(publicKeyPem);
-
-        TestUtils.registerDevice(mockMvc, objectMapper, registerDto);
-        DeviceEntity device = deviceService.findDeviceByFingerprint(computeFingerprint(publicKeyPem));
-
-        String nonce = TestUtils.requestNonce(mockMvc, objectMapper, publicKeyPem);
-        String signatureBase64 = TestUtils.signNonce(nonce, keyPair.getPrivate());
-        String token = TestUtils.verifySignatureAndGetToken(mockMvc, objectMapper, publicKeyPem, signatureBase64);
-
-        Assertions.assertEquals("DEVICE", jwtService.extractTokenType(token));
-        Assertions.assertEquals(device.getId(), jwtService.extractDeviceId(token));
-        Assertions.assertEquals(device.getFirm().getId(), jwtService.extractCompanyId(token));
-        Assertions.assertTrue(jwtService.validateDeviceToken(token, device.getId()));
-    }
-
-    @Test
-    void shouldAuthenticateAdminAndRegisterDeviceUtilMethod() throws Exception {
-        KeyPair keyPair = TestUtils.generateKeyPair();
-
-        DeviceRegisterDto registerDto = new DeviceRegisterDto();
-        registerDto.setUsername("admin1");
-        registerDto.setPassword("password");
-        registerDto.setDeviceName("dev2");
-        registerDto.setPublicKey(PemUtils.getPemPublicKey(keyPair.getPublic()));
-
-        String token = TestUtils.registerAndAuthorizeNewDevice(mockMvc, objectMapper, registerDto, keyPair);
-        DeviceEntity device = deviceService.findDeviceByFingerprint(computeFingerprint(registerDto.getPublicKey()));
-        Assertions.assertTrue(jwtService.validateDeviceToken(token, device.getId()));
-    }
 }

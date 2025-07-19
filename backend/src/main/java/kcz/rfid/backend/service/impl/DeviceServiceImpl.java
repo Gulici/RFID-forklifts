@@ -42,7 +42,6 @@ public class DeviceServiceImpl extends EntityServiceBase<DeviceEntity> implement
         }
 
         DeviceEntity device = new DeviceEntity();
-//        device.setPublicKey(deviceDto.getPublicKey());
         device.setFingerprint(PemUtils.computeFingerprint(deviceDto.getPublicKey()));
         device.setFirm(firmEntity);
         device.setName(deviceDto.getDeviceName());

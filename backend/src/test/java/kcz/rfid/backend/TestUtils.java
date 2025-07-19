@@ -79,4 +79,16 @@ public class TestUtils {
         String signatureBase64 = TestUtils.signNonce(nonce, keyPair.getPrivate());
         return verifySignatureAndGetToken(mockMvc, objectMapper, dto.getPublicKey(), signatureBase64);
     }
+
+    public static String loginUser(MockMvc mockMvc, ObjectMapper objectMapper, LoginRequest request) throws Exception {
+
+        MvcResult result = mockMvc.perform(post("/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.jwt").exists())
+                .andReturn();
+
+        return JsonPath.read(result.getResponse().getContentAsString(), "$.jwt");
+    }
 }

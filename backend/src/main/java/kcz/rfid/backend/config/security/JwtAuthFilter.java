@@ -39,8 +39,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         try {
             switch (jwtService.extractTokenType(token)) {
-                case "user" -> handleUserToken(token);
-                case "device" -> handleDeviceToken(token);
+                case "USER" -> handleUserToken(token);
+                case "DEVICE" -> handleDeviceToken(token);
                 default -> logger.warn("Unsupported token type: " + token);
             }
         } catch (Exception e) {
@@ -54,6 +54,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         UserDetails userDetails = userService.loadUserByUsername(username);
 
         if (jwtService.validateUserToken(token, userDetails)) {
+
+            logger.info(String.format("User %s logged in", userDetails.getUsername()));
+            logger.info(String.format("User %s authorities in", userDetails.getAuthorities()));
+
             var auth = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
