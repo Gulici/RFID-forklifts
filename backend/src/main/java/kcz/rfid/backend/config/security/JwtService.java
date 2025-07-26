@@ -5,15 +5,14 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
@@ -22,10 +21,18 @@ public class JwtService {
     public static final String SECRET = "w4p9Y8Yb6fJk3RbT4aQ2hMnm5G9ZsXvP1tQ8Xk2L3Ug=";
 
 
-    public String generateToken(String email) {
-        Map<String, Object> claims = new HashMap<String, Object>();
+    public String generateToken(Authentication auth) {
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        Map<String, Object> claims = new HashMap<>();
         claims.put("type", TokenType.USER.toString());
-        return createToken(claims,email);
+        claims.put("roles", roles);
+
+        return createToken(claims,userDetails.getUsername());
     }
 
     public String generateDeviceToken(UUID deviceId, UUID companyId) {

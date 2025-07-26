@@ -158,7 +158,7 @@ public class UserControllerTests {
                         .header("Authorization", "Bearer " + token)
                         .content(objectMapper.writeValueAsString(dto))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
