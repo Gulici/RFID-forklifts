@@ -51,7 +51,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(request -> {
                     var cfg = new CorsConfiguration();
                     cfg.setAllowCredentials(true);
-                    cfg.addAllowedOrigin("*");
+                    cfg.addAllowedOrigin("http://localhost:5173");
                     cfg.addAllowedHeader("*");
                     cfg.addAllowedMethod("*");
                     return cfg;
