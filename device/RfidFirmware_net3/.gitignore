@@ -1,0 +1,104 @@
+# Visual Studio
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build results
+bin/
+obj/
+out/
+
+# Rider IDE
+.idea/
+
+# DotNet Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# NuGet
+*.nupkg
+packages/
+.nuget/
+*.snupkg
+*.symbols.nupkg
+
+# Logs
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# Azure Functions build artifacts
+bin/Debug/netstandard2.0/publish/
+
+# Publish outputs
+publish/
+
+# IIS Express
+/.vs/
+
+# User secrets
+secrets.json
+
+# Rider
+.idea/
+
+# JetBrains Rider specific files
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Coverage results
+coverage.*
+*.coverage
+*.coveragexml
+
+# Test results
+TestResults/
+
+# StyleCop
+StyleCopReport.xml
+
+# .NET Core local tools
+.dotnet/tools/
+
+# Entity Framework Core Migrations
+Migrations/
+
+# NCrunch
+*.ncrunch*
+_nCrunch_*
+
+# Coverage tools
+*.lcov
+
+# Profiling
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# Backup & auto-generated files
+*.bak
+*.orig
+*.old
+
+# Others
+*.dbmdl
+
+# Rider caches
+.idea/
+
+# JetBrains Rider
+.idea/
