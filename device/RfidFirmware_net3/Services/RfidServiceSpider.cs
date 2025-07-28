@@ -22,10 +22,13 @@ namespace RfidFirmware.Services
         private byte[] _antennasPowers = new byte[] { 30, 30, 30, 30, 30, 30, 30, 30 };
         private bool _isLoop = false;
 
+        private int _fastSwitchCount = 0;
+        private DateTime _lastFastSwitchLog = DateTime.UtcNow;  
+
         public RfidServiceSpider(IOptions<ReaderSettings> settings, ILogger<RfidServiceSpider> logger)
         {
             _settings = settings.Value;
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger;
         }
 
         public void Disconnect()
@@ -56,7 +59,7 @@ namespace RfidFirmware.Services
 
             for (int i = 0; i < 8; i++)
             {
-                if (enableAntennas.Count > i && enableAntennas[i])
+                if (enableAntennas[i])
                 {
                     _btAryData_4[counter++] = (byte)i;
                     _btAryData_4[counter++] = 1;
@@ -104,7 +107,7 @@ namespace RfidFirmware.Services
         private void OnInventoryTag(RXInventoryTag tag)
         {
             tag.strEPC = tag.strEPC.Replace(" ", "").ToUpper();
-            if (TagRead != null && (string.IsNullOrEmpty(_settings.TagMask) || tag.strEPC.StartsWith(_settings.TagMask)))
+            if (TagRead != null && (String.IsNullOrEmpty(_settings.TagMask) || tag.strEPC.StartsWith(_settings.TagMask)))
             {
                 TagRead.Invoke(new Tag()
                 {
@@ -116,11 +119,21 @@ namespace RfidFirmware.Services
 
         private void OnFastSwitchAntInventoryTagEnd(RXFastSwitchAntInventoryTagEnd tagend)
         {
+            _fastSwitchCount++;
+            var now = DateTime.UtcNow;
+            _logger.LogDebug($"Inventory end. CommandDur: {tagend.mCommandDuration}, TotalRead: {tagend.mTotalRead}");
+            if ((now - _lastFastSwitchLog).TotalSeconds > 1)
+            {
+                _logger.LogDebug($"Inventory restarted count in last second: {_fastSwitchCount}");
+                _fastSwitchCount = 0;
+                _lastFastSwitchLog = now;
+            }
+
             if (_isLoop)
             {
                 _reader.FastSwitchInventory(0xFF, _btAryData_4);
                 _lastInventoryLoop = DateTime.UtcNow;
-                _logger.LogWarning("Inventory restarted");
+                _logger.LogDebug("Inventory restarted");
             }
             else
             {

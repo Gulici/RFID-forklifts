@@ -27,10 +27,11 @@ namespace RfidFirmware_net3
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    // Konfiguracja ReaderSettings (bez ValidateOnStart/ValidateDataAnnotations)
                     services.Configure<ReaderSettings>(hostContext.Configuration.GetSection("Reader"));
+                    services.Configure<ApiSettings>(hostContext.Configuration.GetSection("Api"));
                     
                     var isMock = args.Contains("-mock", StringComparer.OrdinalIgnoreCase);
+                    var isRegister = args.Contains("-register", StringComparer.OrdinalIgnoreCase);
 
                     if (isMock)
                     {
@@ -45,6 +46,13 @@ namespace RfidFirmware_net3
 
                     services.AddSingleton<IFileService, FileService>();
                     services.AddSingleton<IMainService, MainServiceOffline>();
+
+                    services.AddHttpClient<IApiService, ApiService>(client =>
+                    {
+                        client.BaseAddress = new Uri(hostContext.Configuration["Api:Url"]);
+                        client.Timeout = TimeSpan.FromSeconds(10);
+                        client.DefaultRequestHeaders.Add("Accept", "application/json");
+                    });
 
                     services.AddHostedService<Worker>();
                 });

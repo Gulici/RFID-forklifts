@@ -2,7 +2,7 @@ namespace RfidFirmware.Models
 {
     public class Tag
     {
-        private string _tag = string.Empty;
+        private string _tag;
 
         public int AntennaNr { get; set; }
 
@@ -11,12 +11,5 @@ namespace RfidFirmware.Models
             get => _tag.ToUpper();
             set => _tag = value.ToUpper();
         }
-
-        public Tag(string epc)
-        {
-            Epc = epc;
-        }
-
-        public Tag() { }
     }
 }

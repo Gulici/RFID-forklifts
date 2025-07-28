@@ -19,8 +19,8 @@ namespace RfidFirmware.Mocks
         private int _currentIndex = 0;
         private readonly List<string> _epcs;
 
-        public event TagReadHandler? TagRead;
-        public event ConnectionHandler? ReaderConnectionEvent;
+        public event TagReadHandler TagRead;
+        public event ConnectionHandler ReaderConnectionEvent;
 
         public MockRfidService(ILogger<MockRfidService> logger, IOptions<ReaderSettings> settings)
         {
@@ -41,7 +41,7 @@ namespace RfidFirmware.Mocks
             _timer.Elapsed += OnTimerElapsed;
         }
 
-        private void OnTimerElapsed(object? sender, ElapsedEventArgs e)
+        private void OnTimerElapsed(object sender, ElapsedEventArgs e)
         {
             var epc = _epcs[_currentIndex];
             _currentIndex = (_currentIndex + 1) % _epcs.Count;
