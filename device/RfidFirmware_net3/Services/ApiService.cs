@@ -1,5 +1,9 @@
 using System;
+using System.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -30,10 +34,14 @@ namespace RfidFirmware.Services
             try
             {
                 // 1. Request nonce
-                var nonceRequestJson = JsonSerializer.Serialize(new NonceRequest(RsaKeyUtils.GetPublicKeyPem()));
+                var nonceRequestJson = JsonSerializer.Serialize(new NonceRequest(RsaKeyUtils.GetPublicKeyPem()), new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy =JsonNamingPolicy.CamelCase
+                });
+
                 var nonceContent = new StringContent(nonceRequestJson, Encoding.UTF8, "application/json");
 
-                var nonceResponse = await _httpClient.PostAsync("request-nonce", nonceContent);
+                var nonceResponse = await _httpClient.PostAsync("auth/request-nonce", nonceContent);
 
                 if (!nonceResponse.IsSuccessStatusCode)
                 {
@@ -42,7 +50,11 @@ namespace RfidFirmware.Services
                 }
 
                 var nonceResponseJson = await nonceResponse.Content.ReadAsStringAsync();
-                var nonceObj = JsonSerializer.Deserialize<NonceResponse>(nonceResponseJson);
+
+                var nonceObj = JsonSerializer.Deserialize<NonceResponse>(nonceResponseJson, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
 
                 if (nonceObj == null || string.IsNullOrEmpty(nonceObj.Nonce))
                 {
@@ -56,7 +68,10 @@ namespace RfidFirmware.Services
                 // 3. Request jwt
                 var authRequest = new SignedNonceRequest(RsaKeyUtils.GetPublicKeyPem(), signedNonce);
 
-                var authJson = JsonSerializer.Serialize(authRequest);
+                var authJson = JsonSerializer.Serialize(authRequest, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy =JsonNamingPolicy.CamelCase
+                });
                 var authContent = new StringContent(authJson, Encoding.UTF8, "application/json");
 
                 var authResponse = await _httpClient.PostAsync("auth/verify", authContent);
@@ -68,7 +83,10 @@ namespace RfidFirmware.Services
                 }
 
                 var authResponseJson = await authResponse.Content.ReadAsStringAsync();
-                var authObj = JsonSerializer.Deserialize<JwtDto>(authResponseJson);
+                var authObj = JsonSerializer.Deserialize<JwtDto>(authResponseJson, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
 
                 if (authObj == null || string.IsNullOrEmpty(authObj.Jwt))
                 {
@@ -77,7 +95,7 @@ namespace RfidFirmware.Services
                 }
 
                 _jwt = authObj.Jwt;
-                
+
                 _logger.LogInformation("Device authenticated successfully.");
                 return true;
             }
@@ -120,6 +138,107 @@ namespace RfidFirmware.Services
                 _logger.LogError(ex, "Exception durring device register");
                 return false;
             }
+        }
+
+        public async Task<bool> SendTagAsync(Tag tag)
+        {
+            // 1. Parse jwt claims and create dto
+            if (!TryParseJwtClaims(_jwt, out var deviceId, out var firmId))
+            {
+                _logger.LogWarning("JWT invalid or missing claims. Trying to refresh...");
+                var loginSuccess = await LoginDeviceAsync();
+                if (!loginSuccess || !TryParseJwtClaims(_jwt, out deviceId, out firmId))
+                {
+                    _logger.LogError("JWT still invalid after re-login.");
+                    return false;
+                }
+            }
+
+            var locationDto = new DeviceLocationDto
+            {
+                EpcCode = tag.Epc,
+                FirmId = firmId,
+                Id = deviceId
+            };
+
+
+            // 2. Prepare data
+            var json = JsonSerializer.Serialize(locationDto, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            // 3. Send post request with tag in body
+            try
+            {
+                var response = await SendAuthorizedPutAsync("devices/updateLocation", json, _jwt);
+
+                // If UNAUTH then try again after relogging
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    _logger.LogWarning("JWT unauthorized. Trying to re-login and retry...");
+
+                    var loginSuccess = await LoginDeviceAsync();
+                    if (!loginSuccess)
+                        return false;
+
+                    response = await SendAuthorizedPutAsync("devices/updateLocation", json, _jwt);
+                }
+
+
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation("Location updated");
+                    return true;
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                _logger.LogWarning("Location update error. Code: {StatusCode}, Response: {Response}",
+                    response.StatusCode, responseContent);
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception durring update location");
+                return false;
+            }
+        }
+
+        private bool TryParseJwtClaims(string jwt, out Guid deviceId, out Guid firmId)
+        {
+            deviceId = Guid.Empty;
+            firmId = Guid.Empty;
+
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwtObj = handler.ReadJwtToken(jwt);
+
+                var deviceIdClaim = jwtObj.Claims.FirstOrDefault(c => c.Type == "deviceId")?.Value;
+                var firmIdClaim = jwtObj.Claims.FirstOrDefault(c => c.Type == "firmId")?.Value;
+
+                if (Guid.TryParse(deviceIdClaim, out deviceId) && Guid.TryParse(firmIdClaim, out firmId))
+                    return true;
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to parse JWT");
+                return false;
+            }
+        }
+
+        private async Task<HttpResponseMessage> SendAuthorizedPutAsync(string url, string jsonContent, string jwt)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Put, url)
+            {
+                Content = new StringContent(jsonContent, Encoding.UTF8, "application/json")
+            };
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+            return await _httpClient.SendAsync(request);
         }
     }
 }

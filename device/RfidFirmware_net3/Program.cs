@@ -67,13 +67,15 @@ namespace RfidFirmware_net3
                         client.DefaultRequestHeaders.Add("Accept", "application/json");
                     });
 
+                    services.AddSingleton<IMainService, MainService>();
+
                     if (flags.IsRegistered)
                     {
-                        services.AddSingleton<IMainService, MainServiceOffline>();
+                        services.AddSingleton<ITagHandler, OnlineTagHandler>();
                     }
                     else
                     {
-                        services.AddSingleton<IMainService, MainServiceOffline>();
+                        services.AddSingleton<ITagHandler, OfflineTagHandler>();
                     }
 
                     services.AddHostedService<Worker>();

@@ -8,9 +8,12 @@ namespace RfidFirmware.Utils
 {
     public static class RsaKeyUtils
     {
-        private static readonly string KeyDir = Path.Combine(AppContext.BaseDirectory, "keys");
-        private static readonly string PrivateKeyPath = Path.Combine(KeyDir, "device_private.pem");
-        private static readonly string PublicKeyPath = Path.Combine(KeyDir, "device_public.pem");
+        // private static readonly string KeyDir = Path.Combine(AppContext.BaseDirectory, "keys");
+        // private static readonly string PrivateKeyPath = Path.Combine(KeyDir, "device_private.pem");
+        // private static readonly string PublicKeyPath = Path.Combine(KeyDir, "device_public.pem");
+        private static readonly string KeyDir = "keys";
+        private static readonly string PrivateKeyPath = "keys/device_private.pem";
+        private static readonly string PublicKeyPath = "keys/device_public.pem";
         public static string GenerateKeys()
         {
             using var rsa = RSA.Create(2048);

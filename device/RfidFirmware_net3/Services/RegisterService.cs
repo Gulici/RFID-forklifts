@@ -48,7 +48,7 @@ namespace RfidFirmware.Services
 
             var info = new DeviceInfo { DeviceName = deviceName, Registered = true };
             Directory.CreateDirectory("config");
-            File.WriteAllText("config/device_info.json", JsonSerializer.Serialize(info));
+            await File.WriteAllTextAsync("config/device_info.json", JsonSerializer.Serialize(info));
             _logger.LogInformation("Device registered successfully");
             _appLifetime.StopApplication();
         }

@@ -62,7 +62,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private void handleDeviceToken(String token) {
         UUID deviceId = jwtService.extractDeviceId(token);
-        UUID firmId = jwtService.extractCompanyId(token);
+        UUID firmId = jwtService.extractFirmId(token);
 
         if (jwtService.validateDeviceToken(token, deviceId)) {
             var auth = new DeviceAuthenticationToken(deviceId, firmId);

@@ -38,7 +38,7 @@ public class JwtService {
     public String generateDeviceToken(UUID deviceId, UUID companyId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("deviceId", deviceId.toString());
-        claims.put("companyId", companyId.toString());
+        claims.put("firmId", companyId.toString());
         claims.put("type", TokenType.DEVICE.toString());
 
         return createToken(claims, deviceId.toString());
@@ -86,8 +86,8 @@ public class JwtService {
         return UUID.fromString((String) extractAllClaims(token).get("deviceId"));
     }
 
-    public UUID extractCompanyId(String token) {
-        return UUID.fromString((String) extractAllClaims(token).get("companyId"));
+    public UUID extractFirmId(String token) {
+        return UUID.fromString((String) extractAllClaims(token).get("firmId"));
     }
 
     public String extractTokenType(String token) {

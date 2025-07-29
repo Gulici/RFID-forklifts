@@ -13,6 +13,8 @@ namespace RfidFirmware.Services
         private readonly List<Gpio> GpioList = new List<Gpio>();
         private readonly GpioController _controller;
         private readonly ILogger<GpioService> _logger;
+        private readonly object Gpio1_5Lock = new object();
+        private readonly object Gpio6Lock = new object();
 
         public GpioService(ILogger<GpioService> logger)
         {
@@ -37,7 +39,10 @@ namespace RfidFirmware.Services
         {
             if (number < 6)
             {
-                SetGpios(MapTagNrToGpios(number));
+                lock (Gpio1_5Lock)
+                {
+                    SetGpios(MapTagNrToGpios(number));
+                }
             }
             else
             {
@@ -48,7 +53,10 @@ namespace RfidFirmware.Services
         public void SetGpio6(bool state)
         {
             _logger.LogDebug($"set gpio nr 4 (person) state {state}");
-            _controller.Write(9, !state);
+            lock (Gpio6Lock)
+            {
+                _controller.Write(9, !state);
+            }
         }
 
         private List<Gpio> MapTagNrToGpios(int number)
