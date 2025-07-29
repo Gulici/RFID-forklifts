@@ -50,6 +50,7 @@ namespace RfidFirmware.Services
             Directory.CreateDirectory("config");
             File.WriteAllText("config/device_info.json", JsonSerializer.Serialize(info));
             _logger.LogInformation("Device registered successfully");
+            _appLifetime.StopApplication();
         }
 
         private static string ReadPassword()

@@ -1,12 +1,14 @@
 using RfidFirmware.Services.Interfaces;
-using Microsoft.Extensions.Hosting;      
-using Microsoft.Extensions.Logging;     
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
 using RfidFirmware.Configuration;
+using System;
 
 namespace RfidFirmware
 {
+    #nullable enable
     public class Worker : BackgroundService
     {
         private readonly ILogger<Worker> _logger;
@@ -35,7 +37,7 @@ namespace RfidFirmware
             {
                 _logger.LogInformation("RFIDFirmware started");
             });
-            
+
             if (_flags.IsRegister)
             {
                 await _registerService.RegisterAsync();
@@ -46,6 +48,5 @@ namespace RfidFirmware
             }
         }
     }
-    
 }
 

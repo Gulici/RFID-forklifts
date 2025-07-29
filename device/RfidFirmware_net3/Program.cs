@@ -6,6 +6,7 @@ using RfidFirmware.Configuration;
 using RfidFirmware.Services;
 using RfidFirmware.Services.Interfaces;
 using RfidFirmware.Mocks;
+using RfidFirmware.Models;
 using System;
 using System.Linq;
 
@@ -33,9 +34,16 @@ namespace RfidFirmware_net3
                     var flags = new AppFlags
                     {
                         IsMock = args.Contains("-mock", StringComparer.OrdinalIgnoreCase),
-                        IsRegister = args.Contains("-register", StringComparer.OrdinalIgnoreCase)
+                        IsRegister = args.Contains("-register", StringComparer.OrdinalIgnoreCase),
+                        IsRegistered = CheckDeviceAlreadyRegistered()
                     };
-                    services.AddSingleton(flags);              
+                    services.AddSingleton(flags);
+
+                    if (flags.IsRegister && flags.IsRegistered)
+                    {
+                        Console.WriteLine("Device already registered. Exiting...");
+                        Environment.Exit(0);
+                    }
 
 
                     if (flags.IsMock)
@@ -50,7 +58,6 @@ namespace RfidFirmware_net3
                     }
 
                     services.AddSingleton<IFileService, FileService>();
-                    services.AddSingleton<IMainService, MainServiceOffline>();
                     services.AddSingleton<IRegisterService, RegisterService>();
 
                     services.AddHttpClient<IApiService, ApiService>(client =>
@@ -60,7 +67,35 @@ namespace RfidFirmware_net3
                         client.DefaultRequestHeaders.Add("Accept", "application/json");
                     });
 
+                    if (flags.IsRegistered)
+                    {
+                        services.AddSingleton<IMainService, MainServiceOffline>();
+                    }
+                    else
+                    {
+                        services.AddSingleton<IMainService, MainServiceOffline>();
+                    }
+
                     services.AddHostedService<Worker>();
                 });
+                
+        private static bool CheckDeviceAlreadyRegistered()
+        {
+            try
+            {
+                const string filePath = "config/device_info.json";
+                if (!System.IO.File.Exists(filePath))
+                    return false;
+
+                var json = System.IO.File.ReadAllText(filePath);
+                var device = System.Text.Json.JsonSerializer.Deserialize<DeviceInfo>(json);
+
+                return device?.Registered == true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
