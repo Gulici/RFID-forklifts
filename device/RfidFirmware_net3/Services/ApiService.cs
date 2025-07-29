@@ -93,7 +93,11 @@ namespace RfidFirmware.Services
         {
             var registerDto = new DeviceRegisterDto(username, password, deviceName, publicKey);
 
-            var json = JsonSerializer.Serialize(registerDto);
+            var json = JsonSerializer.Serialize(registerDto, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             try
             {

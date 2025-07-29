@@ -15,7 +15,7 @@ namespace RfidFirmware.Utils
         {
             using var rsa = RSA.Create(2048);
             var privateKey = ConvertToPem(rsa.ExportRSAPrivateKey(), "RSA PRIVATE KEY");
-            var publicKey = ConvertToPem(rsa.ExportRSAPublicKey(), "PUBLIC KEY");
+            var publicKey = ConvertToPem(rsa.ExportSubjectPublicKeyInfo(), "PUBLIC KEY");
 
             Directory.CreateDirectory(KeyDir);
             File.WriteAllText(PrivateKeyPath, privateKey);

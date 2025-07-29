@@ -29,11 +29,16 @@ namespace RfidFirmware_net3
                 {
                     services.Configure<ReaderSettings>(hostContext.Configuration.GetSection("Reader"));
                     services.Configure<ApiSettings>(hostContext.Configuration.GetSection("Api"));
-                    
-                    var isMock = args.Contains("-mock", StringComparer.OrdinalIgnoreCase);
-                    var isRegister = args.Contains("-register", StringComparer.OrdinalIgnoreCase);
 
-                    if (isMock)
+                    var flags = new AppFlags
+                    {
+                        IsMock = args.Contains("-mock", StringComparer.OrdinalIgnoreCase),
+                        IsRegister = args.Contains("-register", StringComparer.OrdinalIgnoreCase)
+                    };
+                    services.AddSingleton(flags);              
+
+
+                    if (flags.IsMock)
                     {
                         services.AddSingleton<IGpioService, MockGpioService>();
                         services.AddSingleton<IRfidService, MockRfidService>();
@@ -46,6 +51,7 @@ namespace RfidFirmware_net3
 
                     services.AddSingleton<IFileService, FileService>();
                     services.AddSingleton<IMainService, MainServiceOffline>();
+                    services.AddSingleton<IRegisterService, RegisterService>();
 
                     services.AddHttpClient<IApiService, ApiService>(client =>
                     {

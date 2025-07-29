@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RfidFirmware.Models;
 using RfidFirmware.Services.Interfaces;
@@ -15,19 +16,24 @@ namespace RfidFirmware.Services
     {
         private readonly IApiService _apiService;
         private readonly ILogger<RegisterService> _logger;
+        private readonly IHostApplicationLifetime _appLifetime;
 
-        public RegisterService(IApiService apiService, ILogger<RegisterService> logger)
+        public RegisterService
+            (IApiService apiService,
+            ILogger<RegisterService> logger,
+            IHostApplicationLifetime appLifetime)
         {
             _apiService = apiService;
             _logger = logger;
+            _appLifetime = appLifetime;
         }
         public async Task RegisterAsync()
         {
-            Console.Write("Login: ");
+            Console.Write("Username: ");
             var login = Console.ReadLine();
-            Console.Write("Hasło: ");
-            var password = ReadPassword();
-            Console.Write("Nazwa urządzenia: ");
+            Console.Write("Password: ");
+            var password = Console.ReadLine();
+            Console.Write("Enter new device name: ");
             var deviceName = Console.ReadLine();
 
             var publicKey = RsaKeyUtils.GenerateKeys();
@@ -36,13 +42,14 @@ namespace RfidFirmware.Services
             if (!success)
             {
                 _logger.LogWarning("Unsuccessful register.");
+                _appLifetime.StopApplication();
                 return;
             }
 
             var info = new DeviceInfo { DeviceName = deviceName, Registered = true };
             Directory.CreateDirectory("config");
             File.WriteAllText("config/device_info.json", JsonSerializer.Serialize(info));
-            _logger.LogInformation("Device registered succesfully");
+            _logger.LogInformation("Device registered successfully");
         }
 
         private static string ReadPassword()
