@@ -1,5 +1,11 @@
 package kcz.rfid.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kcz.rfid.backend.config.security.JwtService;
 import kcz.rfid.backend.model.dto.*;
 import kcz.rfid.backend.model.entity.DeviceEntity;
@@ -10,6 +16,7 @@ import kcz.rfid.backend.service.utils.PemUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,6 +37,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(name = "Auth", description = "Operations related to authentication of users and devices")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -38,6 +46,13 @@ public class AuthController {
     private final NonceService nonceService;
     private final DeviceAuthService deviceAuthService;
 
+    @Operation(summary = "Authenticate user", description = "Authenticates user using username and password, returns JWT token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authenticated successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = JwtDto.class))),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class)))
+    })
     @PostMapping("/login")
     public ResponseEntity<JwtDto> login(@RequestBody LoginRequest dto) {
         try {
@@ -52,12 +67,26 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Authenticate device", description = "Verifies signed nonce from device and returns JWT token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Device authenticated successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = JwtDto.class))),
+            @ApiResponse(responseCode = "401", description = "Invalid device credentials or signature",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class)))
+    })
     @PostMapping("/verify")
     public ResponseEntity<JwtDto> loginDevice(@RequestBody SignedNonceRequest request) {
         String jwt = deviceAuthService.verifyAndIssueToken(request);
         return ResponseEntity.ok(new JwtDto(jwt));
     }
 
+    @Operation(summary = "Request nonce", description = "Requests a nonce for device authentication using public key PEM")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Nonce generated successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = NonceResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Device not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class)))
+    })
     @PostMapping("/request-nonce")
     public ResponseEntity<NonceResponse> nonceRequest(@RequestBody NonceRequest request) {
         String fingerprint = PemUtils.computeFingerprint(request.getPublicKeyPem());

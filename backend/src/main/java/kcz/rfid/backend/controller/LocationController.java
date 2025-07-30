@@ -1,5 +1,11 @@
 package kcz.rfid.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kcz.rfid.backend.config.security.SecurityService;
 import kcz.rfid.backend.exception.ResourceNotFoundException;
 import kcz.rfid.backend.model.dto.LocationDto;
@@ -23,6 +29,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/locations")
 @RequiredArgsConstructor
+@Tag(name = "Location", description = "Operations related to location management")
 public class LocationController {
     private final UserService userService;
     private final FirmService firmService;
@@ -30,6 +37,15 @@ public class LocationController {
     private final LocationService locationService;
     private final SecurityService securityService;
 
+    @Operation(summary = "Create a new location", description = "Creates a new location associated with the admin's firm. Requires ADMIN role.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Location created successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LocationDto.class))),
+            @ApiResponse(responseCode = "403", description = "Access denied (not ADMIN role)",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid request body",
+                    content = @Content)
+    })
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LocationDto> createLocation(@RequestBody LocationDto dto, @AuthenticationPrincipal UserDetails userDetails) {
@@ -39,6 +55,13 @@ public class LocationController {
         return new ResponseEntity<>(locationMapper.mapToDto(location), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Get all locations", description = "Returns all locations for the admin's firm. Requires ADMIN role.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of locations",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LocationDto.class, type = "array"))),
+            @ApiResponse(responseCode = "403", description = "Access denied (not ADMIN role)",
+                    content = @Content)
+    })
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<LocationDto>> getAllLocations(@AuthenticationPrincipal UserDetails userDetails) {
@@ -48,7 +71,15 @@ public class LocationController {
         return ResponseEntity.ok(locations.stream().map(locationMapper::mapToDto).toList());
     }
 
-
+    @Operation(summary = "Get location by ID", description = "Returns location details by its ID. Accessible to ROOT users or users of the location's firm.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Location found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LocationDto.class))),
+            @ApiResponse(responseCode = "403", description = "Access denied (not ROOT or not user of firm)",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Location not found",
+                    content = @Content)
+    })
     @GetMapping("/{id}")
     public ResponseEntity<LocationDto> getLocationById(@PathVariable UUID id, @AuthenticationPrincipal UserDetails userDetails) {
         LocationEntity location = locationService.findById(id).orElseThrow(() -> new ResourceNotFoundException("Location not found"));
@@ -60,6 +91,15 @@ public class LocationController {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
+    @Operation(summary = "Update location by ID", description = "Updates location details. Requires ADMIN role and user must be admin of the location's firm.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Location updated successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LocationDto.class))),
+            @ApiResponse(responseCode = "403", description = "Access denied (not ADMIN or not admin of firm)",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Location not found",
+                    content = @Content)
+    })
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LocationDto> updateLocationById(@PathVariable UUID id, @RequestBody LocationDto dto, @AuthenticationPrincipal UserDetails userDetails) {
@@ -73,6 +113,14 @@ public class LocationController {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
+    @Operation(summary = "Delete location by ID", description = "Deletes the location. Requires ADMIN role and user must be admin of the location's firm.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Location deleted successfully"),
+            @ApiResponse(responseCode = "403", description = "Access denied (not ADMIN or not admin of firm)",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Location not found",
+                    content = @Content)
+    })
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteLocationById(@PathVariable UUID id, @AuthenticationPrincipal UserDetails userDetails) {

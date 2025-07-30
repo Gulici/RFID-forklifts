@@ -57,6 +57,11 @@ public class SecurityConfig {
                     return cfg;
                 }))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/devices").permitAll()
                         .anyRequest().authenticated()
