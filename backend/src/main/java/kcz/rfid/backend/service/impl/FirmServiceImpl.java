@@ -13,6 +13,7 @@ import kcz.rfid.backend.service.FirmService;
 import kcz.rfid.backend.service.DeviceService;
 import kcz.rfid.backend.service.LocationService;
 import kcz.rfid.backend.service.UserService;
+import kcz.rfid.backend.service.utils.EpcParserFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +25,15 @@ public class FirmServiceImpl extends EntityServiceBase<FirmEntity> implements Fi
     private final UserService userService;
     private final LocationService locationService;
     private final DeviceService deviceService;
+    private final EpcParserFactory epcParserFactory;
 
-    public FirmServiceImpl(EntityRepository<FirmEntity> repository, FirmRepository firmRepository, UserService userService, LocationService locationService, DeviceService deviceService) {
+    public FirmServiceImpl(EntityRepository<FirmEntity> repository, FirmRepository firmRepository, UserService userService, LocationService locationService, DeviceService deviceService, EpcParserFactory epcParserFactory) {
         super(repository);
         this.firmRepository = firmRepository;
         this.userService = userService;
         this.locationService = locationService;
         this.deviceService = deviceService;
+        this.epcParserFactory = epcParserFactory;
     }
 
     @Override
@@ -100,12 +103,11 @@ public class FirmServiceImpl extends EntityServiceBase<FirmEntity> implements Fi
             throw new ResourceNotFoundException("Firm with id " + dto.getFirmId() + " not found");
         }
 
-        String zoneIdHex = dto.getEpcCode().substring(4,6);
-        int zoneId = Integer.parseInt(zoneIdHex, 16);
+        int zoneId = epcParserFactory.getParser().parseZoneEpc(dto.getEpcCode());
 
         LocationEntity location = locationService.getLocationByFirmAndZoneId(firm, zoneId);
         if (location == null) {
-            throw new ResourceNotFoundException("Location " + zoneIdHex + " for firm " + firm.getFirmName() + " not found");
+            throw new ResourceNotFoundException("Location " + Integer.toHexString(zoneId) + " for firm " + firm.getFirmName() + " not found");
         }
 
         DeviceEntity device = deviceService.findById(dto.getId()).orElseThrow(
