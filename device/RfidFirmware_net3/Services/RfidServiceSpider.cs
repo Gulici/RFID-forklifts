@@ -23,7 +23,7 @@ namespace RfidFirmware.Services
         private bool _isLoop = false;
 
         private int _fastSwitchCount = 0;
-        private DateTime _lastFastSwitchLog = DateTime.UtcNow;  
+        private DateTime _lastFastSwitchLog = DateTime.UtcNow;
 
         public RfidServiceSpider(IOptions<ReaderSettings> settings, ILogger<RfidServiceSpider> logger)
         {
@@ -33,7 +33,15 @@ namespace RfidFirmware.Services
 
         public void Disconnect()
         {
-            _logger.LogInformation("Reader disconnected");
+             try
+            {
+                _reader.CloseCom();
+                _logger.LogInformation("COM port closed successfully.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred while closing COM port.");
+            }
         }
 
         public int GetLastLoggTimeoutSec()
@@ -54,6 +62,7 @@ namespace RfidFirmware.Services
         public void StartInventory()
         {
             var enableAntennas = _settings.EnableAntennas;
+            _logger.LogDebug("EnableAntennas: " + string.Join(", ", enableAntennas));
             _btAryData_4 = new byte[18];
             int counter = 0;
 
@@ -72,14 +81,27 @@ namespace RfidFirmware.Services
             }
             _btAryData_4[16] = 0x00;
             _btAryData_4[17] = 10;
+            // _btAryData_4 = new byte[18]
+            // {
+            //     0x00, 10, // Antenna 0, StayTime = 10 * 100ms = 1s
+            //     0x01, 10, // Antenna 1
+            //     0x02, 10, // Antenna 2
+            //     0x03, 10, // Antenna 3
+            //     0xFF, 0x00, // Antenna 4 disabled
+            //     0xFF, 0x00, // Antenna 5 disabled
+            //     0xFF, 0x00, // Antenna 6
+            //     0xFF, 0x00, // Antenna 7
+            //     0x00,       // Unknown – może loop mode
+            //     255         // Powtórzenia pętli (pełny loop 255 razy)
+            // };
             _reader.FastSwitchInventory(0xFF, _btAryData_4);
             _isLoop = true;
-            _logger.LogWarning("Inventory started");
+            _logger.LogInformation("Inventory started");
             _lastInventoryLoop = DateTime.UtcNow;
         }
 
         public void StopInventory()
-        {
+        {   
             _isLoop = false;
         }
 
@@ -119,16 +141,6 @@ namespace RfidFirmware.Services
 
         private void OnFastSwitchAntInventoryTagEnd(RXFastSwitchAntInventoryTagEnd tagend)
         {
-            _fastSwitchCount++;
-            var now = DateTime.UtcNow;
-            _logger.LogDebug($"Inventory end. CommandDur: {tagend.mCommandDuration}, TotalRead: {tagend.mTotalRead}");
-            if ((now - _lastFastSwitchLog).TotalSeconds > 1)
-            {
-                _logger.LogDebug($"Inventory restarted count in last second: {_fastSwitchCount}");
-                _fastSwitchCount = 0;
-                _lastFastSwitchLog = now;
-            }
-
             if (_isLoop)
             {
                 _reader.FastSwitchInventory(0xFF, _btAryData_4);

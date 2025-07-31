@@ -66,20 +66,24 @@ namespace RfidFirmware.Services
 
                 _tagHandler.CheckAndResetGpio6IfTimeout();
 
-                if (_rfidService.GetLastLoggTimeoutSec() > 10)
+                if (_rfidService.GetLastLoggTimeoutSec() > 3)
                 {
+                    _logger.LogWarning("Inventory loop stuck - starting reset");
                     _logger.LogDebug("stop inventory Timeout");
                     _rfidService.StopInventory();
+                    _rfidService.Disconnect();
                     await Task.Delay(1000, stoppingToken);
                     _logger.LogDebug("start inventory Timeout");
+                    _rfidService.InitReader();
                     _rfidService.StartInventory();
                 }
             }
+            _rfidService.Disconnect();
         }
 
         private void _rfidService_TagRead(Tag tag)
         {
-            _logger.LogDebug($"READED EPC  : {tag.Epc} antenna: {tag.AntennaNr}");
+            _logger.LogInformation($"READED EPC  : {tag.Epc} antenna: {tag.AntennaNr}");
             var gpioNr = MapTagEpcToGpio(tag);
             _tagHandler.HandleTag(tag, gpioNr);
         }
