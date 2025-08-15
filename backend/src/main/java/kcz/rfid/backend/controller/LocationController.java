@@ -9,8 +9,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kcz.rfid.backend.config.security.SecurityService;
 import kcz.rfid.backend.exception.ResourceNotFoundException;
 import kcz.rfid.backend.model.dto.LocationDto;
+import kcz.rfid.backend.model.dto.LocationHistoryDto;
 import kcz.rfid.backend.model.entity.LocationEntity;
+import kcz.rfid.backend.model.entity.LocationHistoryEntity;
 import kcz.rfid.backend.model.entity.UserEntity;
+import kcz.rfid.backend.model.mapper.LocationHistoryMapper;
 import kcz.rfid.backend.model.mapper.LocationMapper;
 import kcz.rfid.backend.service.FirmService;
 import kcz.rfid.backend.service.LocationService;
@@ -36,6 +39,7 @@ public class LocationController {
     private final LocationMapper locationMapper;
     private final LocationService locationService;
     private final SecurityService securityService;
+    private final LocationHistoryMapper locationHistoryMapper;
 
     @Operation(summary = "Create a new location", description = "Creates a new location associated with the admin's firm. Requires ADMIN role.")
     @ApiResponses(value = {
@@ -132,5 +136,14 @@ public class LocationController {
         }
 
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<List<LocationHistoryDto>> getAllLocationHistory(@AuthenticationPrincipal UserDetails userDetails) {
+        UserEntity user = userService.findUserByUsername(userDetails.getUsername());
+
+        List<LocationHistoryEntity> locations = locationService.getLocationHistoryForFirm(user.getFirm());
+
+        return ResponseEntity.ok(locations.stream().map(locationHistoryMapper::mapToDto).toList());
     }
 }

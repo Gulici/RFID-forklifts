@@ -81,24 +81,24 @@ public class DeviceController {
             @ApiResponse(responseCode = "403", description = "Access denied",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class)))
     })
-    @GetMapping
+    @GetMapping("/root")
     @PreAuthorize("hasRole('ROOT')")
     public ResponseEntity<List<DeviceDto>> getAllDevicesRoot(){
         return ResponseEntity.ok(deviceService.getAll().stream().map(deviceMapper::mapToDto).toList());
     }
 
-    @Operation(summary = "Get devices for admins firm", description = "Returns devices belonging to the admins firm, requires ADMIN role")
+    @Operation(summary = "Get devices for users firm", description = "Returns devices belonging to the users firm, requires USER role")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of devices",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeviceDto.class, type = "array"))),
             @ApiResponse(responseCode = "403", description = "Access denied",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class)))
     })
-    @GetMapping("/admin")
-    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping()
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<DeviceDto>> getAllDevicesAdmin(@AuthenticationPrincipal UserDetails userDetails){
-        UserEntity admin = userService.findUserByUsername(userDetails.getUsername());
-        return ResponseEntity.ok(deviceService.findDevicesByFirm(admin.getFirm()).stream().map(deviceMapper::mapToDto).toList());
+        UserEntity user = userService.findUserByUsername(userDetails.getUsername());
+        return ResponseEntity.ok(deviceService.findDevicesByFirm(user.getFirm()).stream().map(deviceMapper::mapToDto).toList());
     }
 
     @Operation(summary = "Get device by ID", description = "Returns device details by device ID")

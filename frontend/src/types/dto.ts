@@ -1,7 +1,7 @@
 export interface DeviceDto {
     id: string
     name: string
-    location: LocationDto
+    location?: LocationDto
 }
 
 export interface LocationDto {
@@ -25,8 +25,10 @@ export interface UserDto {
     username: string
     email: string
     firmName: string
+    roles: Role[];
 }
 
+export type Role = 'ROLE_USER' | 'ROLE_ADMIN' | 'ROLE_ROOT';
 
 export interface LoginRequest {
     username: string
@@ -35,4 +37,10 @@ export interface LoginRequest {
 
 export interface LoginResponse {
     jwt: string
+}
+
+export interface JwtPayload {
+    sub: string;
+    roles: Role[];
+    [key: string]: any;
 }

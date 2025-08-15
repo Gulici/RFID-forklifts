@@ -1,10 +1,14 @@
-import axios, { AxiosHeaders, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios'
+import axios, { AxiosHeaders, InternalAxiosRequestConfig, AxiosInstance } from 'axios'
+import { useAuth } from './auth';
 
-const api = axios.create({
-  baseURL: 'http://localhost:8080/'
-})
+const instance: AxiosInstance = axios.create({
+  baseURL: 'http://localhost:8080/',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
-api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+instance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem('token')
   if (token) {
     if (!config.headers) {
@@ -17,4 +21,15 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config
 })
 
-export default api
+instance.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response?.status === 401) {
+      const auth = useAuth();
+      auth.logout();
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default instance 

@@ -1,33 +1,37 @@
-import { createRouter, createWebHistory, NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
-import LoginView from '@/views/LoginView.vue'
-import DashboardView from '@/views/DashboardView.vue'
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import LoginView from '../views/LoginView.vue'
+import DashboardView from '../views/DashboardView.vue';
+import LocationHistoryView from '../views/LocationHistoryView.vue';
+import AddLocationView from '../views/AddLocationView.vue';
+import { useAuth } from '../services/auth'
+import type { Role } from '../types/dto'
 
-const routes = [
-  { path: '/', name: 'Login', component: LoginView },
-  {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: DashboardView,
-    meta: { requiresAuth: true }
-  }
-]
+interface MetaWithRoles {
+  roles?: Role[];
+}
+
+const routes: Array<RouteRecordRaw & { meta?: MetaWithRoles }> = [
+  { path: '/', name: 'login', component: LoginView },
+  { path: '/dashboard', name: 'dashboard', component: DashboardView, meta: { roles: ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_ROOT'] } },
+  { path: '/history', name: 'history', component: LocationHistoryView, meta: { roles: ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_ROOT'] } },
+  { path: '/add-location', name: 'addLocation', component: AddLocationView, meta: { roles: ['ROLE_ADMIN', 'ROLE_ROOT'] } }
+];
 
 const router = createRouter({
   history: createWebHistory(),
   routes
 })
 
-router.beforeEach((
-  to: RouteLocationNormalized,
-  from: RouteLocationNormalized,
-  next: NavigationGuardNext
-) => {
-  const isAuthenticated = !!localStorage.getItem('token')
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    next({ name: 'Login' })
-  } else {
-    next()
-  }
-})
+router.beforeEach((to, _, next) => {
+  const auth = useAuth();
+  const roles = (to.meta.roles ?? []) as Role[];
 
-export default router
+  if (roles.length && !auth.isLoggedIn) {
+    return next({ name: 'login' });
+  }
+  
+  next();
+});
+
+
+export default router;

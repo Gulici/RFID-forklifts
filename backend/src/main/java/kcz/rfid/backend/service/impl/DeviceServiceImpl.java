@@ -12,6 +12,7 @@ import kcz.rfid.backend.model.repository.DeviceRepository;
 import kcz.rfid.backend.service.DeviceService;
 import kcz.rfid.backend.service.LocationService;
 import kcz.rfid.backend.service.utils.PemUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Collection;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class DeviceServiceImpl extends EntityServiceBase<DeviceEntity> implements DeviceService {
 
@@ -64,6 +66,7 @@ public class DeviceServiceImpl extends EntityServiceBase<DeviceEntity> implement
         device.setLocation(locationEntity);
         var historyEntry = locationService.createNewLocationHistoryEntry(locationEntity, device);
         device.getLocationHistoryList().add(historyEntry);
+        log.info("Location updated for device " + device.getName() + " firm: " + device.getFirm().getFirmName() + " location: " + locationEntity.getName());
         deviceRepository.save(device);
     }
 
