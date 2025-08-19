@@ -1,0 +1,85 @@
+services:
+  postgres:
+    image: postgres:17.6
+    container_name: rfid_db_prod
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    expose:
+      - "5432"
+    volumes:
+      - postgres_data_rfid:/var/lib/postgresql/data
+    networks:
+      - backend-net
+
+  redis:
+    image: redis:latest
+    container_name: rfid_redis_prod
+    expose:
+      - "6379"
+    restart: unless-stopped
+    networks:
+      - backend-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rfid_backend_prod
+    env_file:
+      - .env
+    # environment:
+      # SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      # SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      # SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      # SPRING_REDIS_HOST: redis
+      # SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+    volumes:
+      - ./config:/config
+      - ./db:/db
+    expose:
+      - "8080"
+    networks:
+      - backend-net
+      - frontend-net
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: rfid_frontend_prod
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - frontend-net
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # nginx:
+  #   image: nginx:alpine
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - ./frontend/dist:/usr/share/nginx/html:ro
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   networks:
+  #     - frontend-net
+  #   depends_on:
+  #     - backend
+  #     - frontend
+
+
+volumes:
+  postgres_data_rfid:
+
+networks:
+  backend-net:
+  frontend-net:

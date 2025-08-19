@@ -1,36 +1,60 @@
 <template>
   <div>
     <Navbar />
-    <h2>Location history</h2>
-    <label>Sort by device:</label>
-    <select v-model="selectedDevice" @change="fetchHistory">
-      <option value="">All</option>
-      <option v-for="d in devices" :key="d.id" :value="d.id">{{ d.name }}</option>
-    </select>
+    <div class="container">
+      <h2>Location history</h2>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Device</th>
-          <th>Location</th>
-          <th>Time</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="h in history" :key="h.timestamp">
-          <td>{{ h.deviceDto.name }}</td>
-          <td>{{ h.locationDto.name }}</td>
-          <td>{{ h.timestamp }}</td>
-        </tr>
-      </tbody>
-    </table>
+      <div class="controls">
+        <label for="rowPerPage">Rows per page</label>
+        <select id="rowsPerPage" v-model.number="rowsPerPage">
+          <option :value="5">5</option>
+          <option :value="10">10</option>
+          <option :value="20">20</option>
+        </select>
+      </div>
+
+      <label>Sort by device:</label>
+      <select v-model="selectedDevice" @change="fetchHistory">
+        <option value="">All</option>
+        <option v-for="d in devices" :key="d.id" :value="d.id">{{ d.name }}</option>
+      </select>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Device</th>
+            <th>Location</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="h in paginatedHistory" :key="h.timestamp">
+            <td>{{ h.deviceDto.name }}</td>
+            <td>{{ h.locationDto.name }}</td>
+            <td>{{ h.timestamp }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="pagination">
+        <button
+          v-for="page in pageCount"
+          :key="page"
+          :class="{ active: currentPage === page }"
+          @click="currentPage = page"
+          >
+          {{ page }}
+        </button>
+      </div>
+
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import Navbar from '../components/Navbar.vue';
 import axios from '../services/api';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import type { DeviceDto, LocationDto } from '../types/dto';
 
 interface LocationHistoryItem {
@@ -42,6 +66,18 @@ interface LocationHistoryItem {
 const devices = ref<DeviceDto[]>([]);
 const history = ref<LocationHistoryItem[]>([]);
 const selectedDevice = ref<string>('');
+const rowsPerPage = ref<number>(10);
+const currentPage = ref<number>(1);
+
+const pageCount = computed(() =>
+  Math.ceil(devices.value.length / rowsPerPage.value)
+);
+
+const paginatedHistory = computed(() => {
+  const start = (currentPage.value - 1) * rowsPerPage.value;
+  const end = start + rowsPerPage.value;
+  return history.value.slice(start, end);
+});
 
 const fetchHistory = async () => {
   let url = '/locations/history';

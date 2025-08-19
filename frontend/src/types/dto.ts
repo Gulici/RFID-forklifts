@@ -20,6 +20,13 @@ export interface FirmDto {
     devices: DeviceDto[]
 }
 
+export interface FirmRegisterDto {
+    firmName: string;
+    adminName: string;
+    adminEmail: string;
+    password: string;
+}
+
 export interface UserDto {
     id: string
     username: string

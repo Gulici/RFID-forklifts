@@ -3,6 +3,9 @@ import LoginView from '../views/LoginView.vue'
 import DashboardView from '../views/DashboardView.vue';
 import LocationHistoryView from '../views/LocationHistoryView.vue';
 import AddLocationView from '../views/AddLocationView.vue';
+import CompaniesView from '../views/CompaniesView.vue';
+import ForbiddenView from '../views/ForbiddenView.vue';
+import NotFoundView from '../views/NotFoundView.vue';
 import { useAuth } from '../services/auth'
 import type { Role } from '../types/dto'
 
@@ -12,9 +15,12 @@ interface MetaWithRoles {
 
 const routes: Array<RouteRecordRaw & { meta?: MetaWithRoles }> = [
   { path: '/', name: 'login', component: LoginView },
-  { path: '/dashboard', name: 'dashboard', component: DashboardView, meta: { roles: ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_ROOT'] } },
-  { path: '/history', name: 'history', component: LocationHistoryView, meta: { roles: ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_ROOT'] } },
-  { path: '/add-location', name: 'addLocation', component: AddLocationView, meta: { roles: ['ROLE_ADMIN', 'ROLE_ROOT'] } }
+  { path: '/dashboard', name: 'dashboard', component: DashboardView, meta: { roles: ['ROLE_USER'] } },
+  { path: '/history', name: 'history', component: LocationHistoryView, meta: { roles: ['ROLE_USER'] } },
+  { path: '/add-location', name: 'addLocation', component: AddLocationView, meta: { roles: ['ROLE_ADMIN'] } },
+  { path: '/companies', name: 'companies', component: CompaniesView, meta: { roles: ['ROLE_ROOT'] } },
+  { path: '/403', name: 'forbidden', component: ForbiddenView },
+  { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFoundView},
 ];
 
 const router = createRouter({
@@ -26,8 +32,24 @@ router.beforeEach((to, _, next) => {
   const auth = useAuth();
   const roles = (to.meta.roles ?? []) as Role[];
 
+  // guard for all authorized paths
   if (roles.length && !auth.isLoggedIn) {
     return next({ name: 'login' });
+  }
+
+  if (to.name === 'not-found') {
+    if (!auth.isLoggedIn) {
+      return next({ name: 'login' })
+    } 
+    if (auth.hasRole('ROLE_ROOT')) {
+      return next({ name: 'companies' })
+    }
+    // user/admin
+    return next({ name: 'dashboard' })
+  }
+
+  if (roles.length && !roles.some(r => auth.hasRole(r))) {
+    return next({ name: 'forbidden' });
   }
   
   next();

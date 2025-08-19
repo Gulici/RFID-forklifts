@@ -6,13 +6,15 @@ import type { JwtPayload, LoginResponse, Role } from '../types/dto';
 
 interface AuthState {
   token: string | null;
-  user: string | null;
+  username: string | null;
+  firmName: string | null;
   roles: Role[];
 }
 
 interface AuthStore extends AuthState {
   isLoggedIn: boolean;
   isAdmin: boolean;
+  hasRole: (role: Role) => boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   loadFromStorage: () => void;
@@ -25,7 +27,8 @@ export function useAuth(): AuthStore {
 
   const state = reactive<AuthState>({
     token: null,
-    user: null,
+    username: null,
+    firmName: null,
     roles: [],
   });
 
@@ -42,15 +45,23 @@ export function useAuth(): AuthStore {
     localStorage.setItem('token', newToken);
 
     const decoded = jwtDecode<JwtPayload>(newToken);
-    state.user = decoded.sub;
+    state.username = decoded.sub;
+    state.firmName = decoded.firmName;
     state.roles = (decoded.roles as Role[]) || [];
+
+    console.log(state.username + " " + state.firmName);
   }
 
   async function login(username: string, password: string) {
     try {
       const res = await axios.post<LoginResponse>('/auth/login', { username, password });
       setToken(res.data.jwt);
-      router.push('/dashboard');
+
+      if (state.roles.includes('ROLE_ROOT')) {
+        router.replace('/companies');
+      } else {
+        router.replace('/dashboard');
+      }
     } catch (err) {
       console.error('Login failed', err);
       throw err;
@@ -59,7 +70,8 @@ export function useAuth(): AuthStore {
 
   function logout() {
     state.token = null;
-    state.user = null;
+    state.username = null;
+    state.firmName = null;
     state.roles = [];
     localStorage.removeItem('token');
     router.push('/');
@@ -70,6 +82,10 @@ export function useAuth(): AuthStore {
     if (savedToken) setToken(savedToken);
   }
 
+  function hasRole(role: Role) {
+  console.log("User roles:", state.roles);
+  return state.roles.includes(role);
+}
   authInstance = {
     ...state,
     get isLoggedIn() { return isLoggedIn.value; },
@@ -77,6 +93,7 @@ export function useAuth(): AuthStore {
     login,
     logout,
     loadFromStorage,
+    hasRole,
   };
 
   return authInstance;

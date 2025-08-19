@@ -5,6 +5,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import kcz.rfid.backend.model.entity.FirmEntity;
+import kcz.rfid.backend.model.entity.UserEntity;
+import kcz.rfid.backend.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,10 +22,16 @@ import java.util.function.Function;
 public class JwtService {
     // development version
     public static final String SECRET = "w4p9Y8Yb6fJk3RbT4aQ2hMnm5G9ZsXvP1tQ8Xk2L3Ug=";
+    private final UserService userService;
+
+    public JwtService(UserService userService) {
+        this.userService = userService;
+    }
 
 
     public String generateToken(Authentication auth) {
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        UserEntity user = userService.findUserByUsername(userDetails.getUsername());
 
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -30,6 +39,7 @@ public class JwtService {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", TokenType.USER.toString());
+        claims.put("firmName", user.getFirm() != null ? user.getFirm().getFirmName() : "ROOT");
         claims.put("roles", roles);
 
         return createToken(claims,userDetails.getUsername());

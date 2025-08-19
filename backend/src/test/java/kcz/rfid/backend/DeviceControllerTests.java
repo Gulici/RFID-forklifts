@@ -74,7 +74,7 @@ public class DeviceControllerTests {
 
         Assertions.assertEquals("DEVICE", jwtService.extractTokenType(token));
         Assertions.assertEquals(device.getId(), jwtService.extractDeviceId(token));
-        Assertions.assertEquals(device.getFirm().getId(), jwtService.extractCompanyId(token));
+        Assertions.assertEquals(device.getFirm().getId(), jwtService.extractFirmId(token));
         Assertions.assertTrue(jwtService.validateDeviceToken(token, device.getId()));
     }
 
@@ -105,7 +105,7 @@ public class DeviceControllerTests {
 
         String token = TestUtils.registerAndAuthorizeNewDevice(mockMvc, objectMapper, registerDto, keyPair);
         UUID deviceId = jwtService.extractDeviceId(token);
-        UUID firmId = jwtService.extractCompanyId(token);
+        UUID firmId = jwtService.extractFirmId(token);
 
         DeviceLocationDto dto = new DeviceLocationDto();
         dto.setId(deviceId);
