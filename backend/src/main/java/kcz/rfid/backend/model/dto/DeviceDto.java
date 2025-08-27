@@ -14,4 +14,6 @@ public class DeviceDto {
     private String name;
     @Schema(description = "Current location of the device")
     private LocationDto location;
+    @Schema(description = "Field telling if device is currently on, based on lastSeen timestamp", example = "true")
+    private boolean isAlive;
 }

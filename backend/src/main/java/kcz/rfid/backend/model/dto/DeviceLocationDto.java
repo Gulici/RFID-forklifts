@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-@Schema(description = "Basic device location information")
+@Schema(description = "Basic device location information used to update location and log isAlive data")
 public class DeviceLocationDto {
     @Schema(description = "Unique identifier of the device location", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     private UUID id;

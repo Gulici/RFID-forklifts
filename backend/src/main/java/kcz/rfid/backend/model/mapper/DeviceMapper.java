@@ -20,6 +20,11 @@ public class DeviceMapper implements Mapper<DeviceEntity, DeviceDto> {
         dto.setName(device.getName());
         if (device.getLocation() != null)
             dto.setLocation(locationMapper.mapToDto(device.getLocation()));
+        if (device.getLastSeen() != null) {
+            dto.setAlive(device.isAlive());
+        } else {
+            dto.setAlive(false);
+        }
         return dto;
     }
 }

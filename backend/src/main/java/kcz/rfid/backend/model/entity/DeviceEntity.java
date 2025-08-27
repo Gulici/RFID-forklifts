@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,12 +19,11 @@ public class DeviceEntity extends EntityBase {
     @Column(nullable = false, unique = true)
     private String name;
 
-//    @Column(nullable = false, unique = true)
-//    @Lob
-//    private String publicKey;
-
     @Column(nullable = false, unique = true)
     private String fingerprint;
+
+    @Column(nullable = true)
+    private LocalDateTime lastSeen;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "firm_id", nullable = false)
@@ -35,4 +35,9 @@ public class DeviceEntity extends EntityBase {
 
     @OneToMany(mappedBy = "device", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<LocationHistoryEntity> locationHistoryList = new ArrayList<>();
+
+    @Transient
+    public boolean isAlive() {
+        return lastSeen != null && lastSeen.isAfter(LocalDateTime.now().minusMinutes(2));
+    }
 }

@@ -52,6 +52,7 @@ public class SecurityConfig {
                     var cfg = new CorsConfiguration();
                     cfg.setAllowCredentials(true);
                     cfg.addAllowedOrigin("http://localhost:5173");
+                    cfg.addAllowedOrigin("http://localhost");
                     cfg.addAllowedHeader("*");
                     cfg.addAllowedMethod("*");
                     return cfg;
@@ -59,6 +60,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(
                                 "/v3/api-docs/**",
+                                "/swagger-ui/",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
