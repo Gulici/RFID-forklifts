@@ -66,15 +66,18 @@ public class DeviceServiceImpl extends EntityServiceBase<DeviceEntity> implement
     public void updateLocation(DeviceEntity device, LocationEntity locationEntity) {
         device.setLastSeen(LocalDateTime.now());
 
-        if (!device.getLocation().equals(locationEntity)) {
+        LocationEntity currentLocation = device.getLocation();
+        if (currentLocation == null || !currentLocation.equals(locationEntity)) {
             device.setLocation(locationEntity);
             var historyEntry = locationService.createNewLocationHistoryEntry(locationEntity, device);
             device.getLocationHistoryList().add(historyEntry);
-            log.info("Location updated for device {} firm: {} location: {}", device.getName(), device.getFirm().getFirmName(), locationEntity.getName());
+            log.info("Location updated for device {} firm: {} location: {}",
+                    device.getName(), device.getFirm().getFirmName(), locationEntity.getName());
         }
 
         deviceRepository.save(device);
     }
+
 
     @Override
     public Collection<DeviceEntity> findDevicesByFirm(FirmEntity firm) {
