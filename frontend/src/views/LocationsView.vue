@@ -6,7 +6,7 @@
       <div>
         <form @submit.prevent="addLocation">
           <input v-model="name" placeholder="Name" required />
-          <input v-model.number="zoneId" type="number" placeholder="Zone ID" required />
+          <input v-model="zoneId" type="string" placeholder="Zone ID hex" required />
           <input v-model.number="x" type="number" placeholder="X" required />
           <input v-model.number="y" type="number" placeholder="Y" required />
           <button type="submit">Add</button>
@@ -24,13 +24,18 @@
         <tbody>
           <tr v-for="location in paginatedLocations" :key="location.id">
             <td>{{ location.name }}</td>
-            <td>{{ location.zoneId }}</td>
+            <td>
+              <span v-if="location.zoneId !== null">
+                {{ location.zoneId }} (0x{{ location.zoneId.toString(16).toUpperCase() }})
+              </span>
+              <span v-else>-</span>
+            </td>
             <td>{{ location.x }} {{ location.y }}</td>
           </tr>
         </tbody>
         </table>
       </div>
-      <div class="pagination">
+      <!-- <div class="pagination">
         <button
           v-for="page in pageCount"
           :key="page"
@@ -39,7 +44,7 @@
           >
           {{ page }}
         </button>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -51,7 +56,7 @@ import { computed, onMounted, ref } from 'vue';
 import type { LocationDto } from '../types/dto';
 
 const name = ref<string>('');
-const zoneId = ref<number | null>(null);
+const zoneId = ref<string>('');
 const x = ref<number | null>(null);
 const y = ref<number | null>(null);
 
@@ -71,14 +76,26 @@ const paginatedLocations = computed(() => {
 });
 
 const addLocation = async () => {
-  const payload: Omit<LocationDto, 'id'> = {
-    name: name.value,
-    zoneId: zoneId.value!,
-    x: x.value!,
-    y: y.value!
-  };
-  await axios.post('/locations', payload);
-  alert('Location added');
+  try {
+    const parsedZoneId = parseInt(zoneId.value, 16);
+    if (isNaN(parsedZoneId)) {
+      alert('Invalid format Zone ID (enter hex number, ex. "1A")');
+      return;
+    }
+
+    const payload: Omit<LocationDto, 'id'> = {
+      name: name.value,
+      zoneId: parsedZoneId,
+      x: x.value!,
+      y: y.value!
+    };
+
+    await axios.post('/locations', payload);
+    alert('Location added');
+  } catch (e) {
+    console.error(e);
+    alert('Error durring location adding.');
+  }
 };
 
 onMounted(async () => {

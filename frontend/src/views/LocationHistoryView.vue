@@ -4,20 +4,20 @@
     <div class="container">
       <h2>Location history</h2>
 
-      <div class="controls">
+      <!-- <div class="controls">
         <label for="rowPerPage">Rows per page</label>
         <select id="rowsPerPage" v-model.number="rowsPerPage">
           <option :value="5">5</option>
           <option :value="10">10</option>
           <option :value="20">20</option>
         </select>
-      </div>
+      </div> -->
 
-      <label>Sort by device:</label>
+      <!-- <label>Sort by device:</label>
       <select v-model="selectedDevice" @change="fetchHistory">
         <option value="">All</option>
         <option v-for="d in devices" :key="d.id" :value="d.id">{{ d.name }}</option>
-      </select>
+      </select> -->
 
       <table>
         <thead>
@@ -30,13 +30,13 @@
         <tbody>
           <tr v-for="h in paginatedHistory" :key="h.timestamp">
             <td>{{ h.deviceDto.name }}</td>
-            <td>{{ h.locationDto.name }}</td>
+            <td>{{ h.locationDto.name }} id: {{ h.locationDto.zoneId }} (0x{{ h.locationDto.zoneId.toString(16).toUpperCase() }})</td>
             <td>{{ h.timestamp }}</td>
           </tr>
         </tbody>
       </table>
 
-      <div class="pagination">
+      <!-- <div class="pagination">
         <button
           v-for="page in pageCount"
           :key="page"
@@ -45,7 +45,7 @@
           >
           {{ page }}
         </button>
-      </div>
+      </div> -->
 
     </div>
   </div>
@@ -55,16 +55,11 @@
 import Navbar from '../components/Navbar.vue';
 import axios from '../services/api';
 import { ref, onMounted, computed } from 'vue';
-import type { DeviceDto, LocationDto } from '../types/dto';
+import type { DeviceDto, LocationDto, LocationHistoryDto } from '../types/dto';
 
-interface LocationHistoryItem {
-  deviceDto: DeviceDto,
-  locationDto: LocationDto,
-  timestamp: string
-}
 
 const devices = ref<DeviceDto[]>([]);
-const history = ref<LocationHistoryItem[]>([]);
+const history = ref<LocationHistoryDto[]>([]);
 const selectedDevice = ref<string>('');
 const rowsPerPage = ref<number>(10);
 const currentPage = ref<number>(1);
@@ -84,7 +79,7 @@ const fetchHistory = async () => {
   // if (selectedDevice.value) {
   //   url += `?deviceId=${selectedDevice.value}`;
   // }
-  const res = await axios.get<LocationHistoryItem[]>(url);
+  const res = await axios.get<LocationHistoryDto[]>(url);
   history.value = res.data;
 };
 

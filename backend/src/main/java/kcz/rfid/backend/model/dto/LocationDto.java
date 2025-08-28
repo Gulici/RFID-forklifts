@@ -12,7 +12,7 @@ public class LocationDto {
     private UUID id;
     @Schema(description = "Name of the location", example = "Warehouse Zone A")
     private String name;
-    @Schema(description = "Zone identifier", example = "1")
+    @Schema(description = "Zone identifier (provided in hex, stored as decimal)", example = "0x1A")
     private Integer zoneId;
     @Schema(description = "X coordinate within the zone", example = "100")
     private int x;

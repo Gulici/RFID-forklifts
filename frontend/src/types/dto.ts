@@ -2,14 +2,22 @@ export interface DeviceDto {
     id: string
     name: string
     location?: LocationDto
+    alive: boolean
+    timestamp: string
 }
 
 export interface LocationDto {
     id: string
     name: string
-    zoneId: number | null
+    zoneId: number
     x: number
     y: number
+}
+
+export interface LocationHistoryDto {
+  deviceDto: DeviceDto,
+  locationDto: LocationDto,
+  timestamp: string
 }
 
 export interface FirmDto {

@@ -25,6 +25,8 @@ public class DeviceMapper implements Mapper<DeviceEntity, DeviceDto> {
         } else {
             dto.setAlive(false);
         }
+        if (device.getTimestamp() != null)
+            dto.setTimestamp(device.getTimestamp());
         return dto;
     }
 }

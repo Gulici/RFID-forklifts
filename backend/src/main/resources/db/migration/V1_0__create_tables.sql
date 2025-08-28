@@ -27,14 +27,14 @@ create table devices
     id uuid not null,
     name varchar(255) not null,
     fingerprint varchar(255) not null,
---     public_key oid not null,
     firm_id uuid not null,
     location_id uuid,
+    last_seen timestamp(6),
+    timestamp timestamp(6),
     primary key (id),
 
     constraint uq_devices_name unique (name),
     constraint uq_devices_fingerprint unique (fingerprint),
---     constraint uq_devices_public_key unique (public_key),
 
     constraint fk_devices_firm_id foreign key (firm_id) references firms,
     constraint fk_devices_location_id foreign key (location_id) references locations

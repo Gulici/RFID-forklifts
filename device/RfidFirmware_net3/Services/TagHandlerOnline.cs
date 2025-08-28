@@ -17,6 +17,7 @@ namespace RfidFirmware.Services
         private readonly int _InventoryTimeout;
 
         private string _readedEpc = "";
+        private Tag? _lastTag;
         private string _readedEpc6 = "";
         private DateTime _lastReadTag6 = DateTime.Now;
 
@@ -42,6 +43,7 @@ namespace RfidFirmware.Services
                 if (gpioNr < 6 && !_readedEpc.Contains(tag.Epc))
                 {
                     _readedEpc = tag.Epc;
+                    _lastTag = tag;
                     _gpioService.SetGpio1_5(gpioNr);
                     _fileService.SaveGpioNrAsync(gpioNr);
                     _apiService.SendTagAsync(tag);
@@ -56,6 +58,11 @@ namespace RfidFirmware.Services
                     }
                 }
             }
+        }
+
+        public void SendLastTag()
+        {   
+            _apiService.SendTagAsync(_lastTag);
         }
 
         public void CheckAndResetGpio6IfTimeout()

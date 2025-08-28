@@ -83,7 +83,10 @@ public class LocationServiceImpl extends EntityServiceBase<LocationEntity> imple
         LocationHistoryEntity locationHistoryEntity = new LocationHistoryEntity();
         locationHistoryEntity.setLocation(location);
         locationHistoryEntity.setDevice(device);
-        locationHistoryEntity.setTimestamp(LocalDateTime.now());
+
+        LocalDateTime now = LocalDateTime.now();
+        locationHistoryEntity.setTimestamp(now);
+        device.setTimestamp(now);
 
         return locationHistoryRepository.save(locationHistoryEntity);
     }

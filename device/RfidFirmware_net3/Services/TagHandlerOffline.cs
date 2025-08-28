@@ -54,6 +54,10 @@ namespace RfidFirmware.Services
             }
         }
 
+        public void SendLastTag()
+        {
+        }
+
         public void CheckAndResetGpio6IfTimeout()
         {
             if (!string.IsNullOrEmpty(_readedEpc6) &&

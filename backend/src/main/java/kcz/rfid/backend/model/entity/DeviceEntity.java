@@ -22,8 +22,11 @@ public class DeviceEntity extends EntityBase {
     @Column(nullable = false, unique = true)
     private String fingerprint;
 
-    @Column(nullable = true)
+    @Column(name = "last_seen")
     private LocalDateTime lastSeen;
+
+    @Column(name = "timestamp")
+    private LocalDateTime timestamp;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "firm_id", nullable = false)

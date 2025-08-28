@@ -11,10 +11,10 @@
               <router-link to="/dashboard" @click="closeMenu">Devices</router-link>
             </li>
             <li v-if="auth.isAdmin">
-              <router-link to="/add-location" @click="closeMenu">Locations</router-link>
+              <router-link to="/locations" @click="closeMenu">Locations</router-link>
             </li>
             <li>
-              <router-link to="/history" @click="closeMenu">Locations history</router-link>
+              <router-link to="/history" @click="closeMenu">Devices history</router-link>
             </li>
             <li>
               <button @click="auth.logout">Logout</button>

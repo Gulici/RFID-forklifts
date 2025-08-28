@@ -18,6 +18,7 @@ namespace RfidFirmware.Services
         private readonly IFileService _fileService;
         private readonly ITagHandler _tagHandler;
         private readonly ReaderSettings _settings;
+        private DateTime _lastLogTime;
 
         public MainService
             (ILogger<MainService> logger,
@@ -77,6 +78,12 @@ namespace RfidFirmware.Services
                     _rfidService.InitReader();
                     _rfidService.StartInventory();
                 }
+
+                if ((DateTime.UtcNow - _lastLogTime).TotalSeconds > 60)
+                {
+                    _tagHandler.SendLastTag();
+                    _lastLogTime = DateTime.UtcNow;
+                }
             }
             _rfidService.Disconnect();
         }
@@ -87,7 +94,11 @@ namespace RfidFirmware.Services
             var gpioNr = MapTagEpcToGpio(tag);
             _tagHandler.HandleTag(tag, gpioNr);
         }
-        
+
+        private void LogIsAlive() {
+            _tagHandler.SendLastTag();
+        }
+
         private int MapTagEpcToGpio(Tag tag)
         {
             bool antennaFor_1_5 = _settings.AntennasForGpios1_3[tag.AntennaNr - 1];

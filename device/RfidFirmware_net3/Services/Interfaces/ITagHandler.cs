@@ -6,6 +6,7 @@ namespace RfidFirmware.Services.Interfaces
     {
         void HandleTag(Tag tag, int gpioNr);
         public void CheckAndResetGpio6IfTimeout();
+        public void SendLastTag();
     }
 
 }

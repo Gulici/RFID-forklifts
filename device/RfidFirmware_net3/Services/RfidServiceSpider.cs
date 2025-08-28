@@ -81,19 +81,7 @@ namespace RfidFirmware.Services
             }
             _btAryData_4[16] = 0x00;
             _btAryData_4[17] = 10;
-            // _btAryData_4 = new byte[18]
-            // {
-            //     0x00, 10, // Antenna 0, StayTime = 10 * 100ms = 1s
-            //     0x01, 10, // Antenna 1
-            //     0x02, 10, // Antenna 2
-            //     0x03, 10, // Antenna 3
-            //     0xFF, 0x00, // Antenna 4 disabled
-            //     0xFF, 0x00, // Antenna 5 disabled
-            //     0xFF, 0x00, // Antenna 6
-            //     0xFF, 0x00, // Antenna 7
-            //     0x00,       // Unknown – może loop mode
-            //     255         // Powtórzenia pętli (pełny loop 255 razy)
-            // };
+            
             _reader.FastSwitchInventory(0xFF, _btAryData_4);
             _isLoop = true;
             _logger.LogInformation("Inventory started");
