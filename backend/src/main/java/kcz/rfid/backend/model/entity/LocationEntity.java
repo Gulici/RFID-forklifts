@@ -18,7 +18,7 @@ public class LocationEntity extends EntityBase {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private int zoneId;
 
     @Column(nullable = false)
