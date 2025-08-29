@@ -111,12 +111,11 @@ const addLocation = async () => {
   } catch (error: any) {
     console.error(error);
 
-    if(error.response) {
-      const data = error.response.data;
-
-      alert(data.detail || data.title || 'Error during location adding.');
+     if (error.response && error.response.status === 409) {
+      const detail = error.response.data.detail || error.response.data.title;
+      alert(`Cannot add location: ${detail}`);
     } else {
-      alert('Error durring location adding.');
+      alert('Error durring adding location');
     }
   }
 };
