@@ -16,9 +16,6 @@ create table locations
     firm_id uuid not null,
     primary key (id),
 
-    constraint uq_locations_name unique (name),
-    constraint uq_locations_zone_id unique (zone_id),
-
     constraint fk_locations_firm_id foreign key (firm_id) references firms
 );
 
@@ -33,7 +30,6 @@ create table devices
     timestamp timestamp(6),
     primary key (id),
 
-    constraint uq_devices_name unique (name),
     constraint uq_devices_fingerprint unique (fingerprint),
 
     constraint fk_devices_firm_id foreign key (firm_id) references firms,

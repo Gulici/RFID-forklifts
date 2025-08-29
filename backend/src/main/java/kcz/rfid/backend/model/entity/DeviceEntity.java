@@ -16,7 +16,7 @@ import java.util.List;
 @ToString(exclude = {"locationHistoryList"})
 public class DeviceEntity extends EntityBase {
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false, unique = true)

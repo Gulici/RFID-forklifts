@@ -15,7 +15,7 @@ import java.util.List;
 @ToString(exclude = {"devices", "locationHistoryList"})
 public class LocationEntity extends EntityBase {
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
