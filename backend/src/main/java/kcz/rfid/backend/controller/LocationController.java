@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kcz.rfid.backend.config.security.SecurityService;
+import kcz.rfid.backend.exception.CannotDeleteResourceException;
 import kcz.rfid.backend.exception.ResourceNotFoundException;
 import kcz.rfid.backend.model.dto.LocationDto;
 import kcz.rfid.backend.model.dto.LocationHistoryDto;
@@ -129,6 +130,18 @@ public class LocationController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteLocationById(@PathVariable UUID id, @AuthenticationPrincipal UserDetails userDetails) {
         LocationEntity location = locationService.findById(id).orElseThrow(() -> new ResourceNotFoundException("Location not found"));
+
+        if (!location.getDevices().isEmpty()) {
+            throw new CannotDeleteResourceException(
+                    String.format("Location '%s' has devices and cannot be deleted", location.getName())
+            );
+        }
+
+        if (!location.getLocationHistoryList().isEmpty()) {
+            throw new CannotDeleteResourceException(
+                    String.format("Location '%s' has location history and cannot be deleted", location.getName())
+            );
+        }
 
         if (securityService.isAdminOfFirm(userDetails, location.getFirm())) {
             locationService.delete(location);

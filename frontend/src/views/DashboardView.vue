@@ -19,7 +19,7 @@
             <th>Last location</th>
             <th>Last time</th>
             <th>Is active</th>
-            <!-- <th v-if="auth.isAdmin">Actions</th> -->
+            <th v-if="auth.isAdmin">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -37,9 +37,9 @@
             </td>
             <td>{{ device.timestamp }}</td>
             <td>{{ device.alive }}</td>
-            <!-- <td v-if="auth.isAdmin">
+            <td v-if="auth.isAdmin">
               <button @click="deleteDevice(device.id)">Delete</button>
-            </td> -->
+            </td>
           </tr>
         </tbody>
       </table>
@@ -82,17 +82,17 @@ const currentPage = ref<number>(1);
 //   return devices.value.slice(start, end);
 // });
 
-// const deleteDevice = async (id: string) => {
-//   if (!confirm('Are you sure you want to delete this device?')) return;
+const deleteDevice = async (id: string) => {
+  if (!confirm('Are you sure you want to delete this device?')) return;
 
-//   try {
-//     await axios.delete(`/devices/${id}`);
-//     devices.value = devices.value.filter(d => d.id !== id);
-//   } catch (error) {
-//     console.error('Error deleting device:', error);
-//     alert('Failed to delete device.');
-//   }
-// };
+  try {
+    await axios.delete(`/devices/${id}`);
+    devices.value = devices.value.filter(d => d.id !== id);
+  } catch (error) {
+    console.error('Error deleting device:', error);
+    alert('Failed to delete device.');
+  }
+};
 
 onMounted(async () => {
   const res = await axios.get<DeviceDto[]>('/devices');

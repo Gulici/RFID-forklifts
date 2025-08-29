@@ -28,7 +28,7 @@ public class LocationEntity extends EntityBase {
     @JoinColumn(name = "firm_id", nullable = false)
     private FirmEntity firm;
 
-    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "location")
     private List<DeviceEntity> devices = new ArrayList<>();
 
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)

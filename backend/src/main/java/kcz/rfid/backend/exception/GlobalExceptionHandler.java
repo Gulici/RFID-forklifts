@@ -16,4 +16,9 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleResourceNotFoundException(ResourceNotFoundException e) {
         return (ProblemDetail) e.getBody();
     }
+
+    @ExceptionHandler(CannotDeleteResourceException.class)
+    public ProblemDetail handleCannotDeleteResourceException(CannotDeleteResourceException e) {
+        return (ProblemDetail) e.getBody();
+    }
 }

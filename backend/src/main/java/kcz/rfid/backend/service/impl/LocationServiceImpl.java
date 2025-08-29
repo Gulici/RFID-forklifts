@@ -35,6 +35,17 @@ public class LocationServiceImpl extends EntityServiceBase<LocationEntity> imple
             throw new IllegalArgumentException("LocationDto cannot have null or empty values");
         }
 
+        locationRepository.findByName(locationDto.getName()).ifPresent(location -> {
+            if (location.getFirm().equals(firmEntity)) {
+                throw new ResourceAlreadyExistsException("Location with name " + locationDto.getName() + " already exists");
+            }
+        });
+        locationRepository.findByZoneId(locationDto.getZoneId()).ifPresent(location -> {
+            if (location.getFirm().equals(firmEntity)) {
+                throw new ResourceAlreadyExistsException("Location with Zone ID " + locationDto.getZoneId() + " already exists");
+            }
+        });
+
         LocationEntity locationEntity = new LocationEntity();
         locationEntity.setName(locationDto.getName());
         locationEntity.setZoneId(locationDto.getZoneId());
@@ -53,16 +64,20 @@ public class LocationServiceImpl extends EntityServiceBase<LocationEntity> imple
         }
 
         if (locationDto.getName() != null) {
-            if (locationRepository.findByName(locationDto.getName()).isPresent()) {
-                throw new ResourceAlreadyExistsException("Location with name " + locationDto.getName() + " already exists");
-            }
+            locationRepository.findByName(locationDto.getName()).ifPresent(location -> {
+                if (location.getFirm().equals(locationEntity.getFirm())) {
+                    throw new ResourceAlreadyExistsException("Location with name " + locationDto.getName() + " already exists");
+                }
+            });
             locationEntity.setName(locationDto.getName());
         }
         if (locationDto.getZoneId() != null) {
-            if (locationRepository.findByZoneId(locationDto.getZoneId()).isPresent()) {
-                throw new ResourceAlreadyExistsException("Location with name " + locationDto.getName() + " already exists");
-            }
-            locationEntity.setName(locationDto.getName());
+            locationRepository.findByZoneId(locationDto.getZoneId()).ifPresent(location -> {
+                if (location.getFirm().equals(locationEntity.getFirm())) {
+                    throw new ResourceAlreadyExistsException("Location with Zone ID " + locationDto.getZoneId() + " already exists");
+                }
+            });
+            locationEntity.setZoneId(locationDto.getZoneId());
         }
 
         locationEntity.setX(locationDto.getX());
