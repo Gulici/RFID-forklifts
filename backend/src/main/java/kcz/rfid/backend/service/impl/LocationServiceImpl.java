@@ -35,13 +35,6 @@ public class LocationServiceImpl extends EntityServiceBase<LocationEntity> imple
             throw new IllegalArgumentException("LocationDto cannot have null or empty values");
         }
 
-        if (locationRepository.findByName(locationDto.getName()).isPresent()) {
-            throw new ResourceAlreadyExistsException("Location with name " + locationDto.getName() + " already exists");
-        }
-        if (locationRepository.findByZoneId(locationDto.getZoneId()).isPresent()) {
-            throw new ResourceAlreadyExistsException("Zone with id " + locationDto.getZoneId() + " already exists");
-        }
-
         LocationEntity locationEntity = new LocationEntity();
         locationEntity.setName(locationDto.getName());
         locationEntity.setZoneId(locationDto.getZoneId());
