@@ -142,6 +142,7 @@ namespace RfidFirmware.Services
 
         public async Task<bool> SendTagAsync(Tag tag)
         {
+            _logger.LogDebug("INSIDE SendTagAsync ApiService");
             // 1. Parse jwt claims and create dto
             if (!TryParseJwtClaims(_jwt, out var deviceId, out var firmId))
             {

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using System.Text.RegularExpressions;
 using RfidFirmware;
 using RfidFirmware.Configuration;
 using RfidFirmware.Services;
@@ -27,7 +29,12 @@ namespace RfidFirmware_net3
                     logging.AddConsole();
                 })
                 .ConfigureServices((hostContext, services) =>
-                {
+                {   
+                    var env = hostContext.HostingEnvironment.EnvironmentName;
+                    Console.WriteLine($"Current environment: {env}");
+                    
+                    ValidateReaderSettings(hostContext.Configuration);
+
                     services.Configure<ReaderSettings>(hostContext.Configuration.GetSection("Reader"));
                     services.Configure<ApiSettings>(hostContext.Configuration.GetSection("Api"));
 
@@ -35,6 +42,7 @@ namespace RfidFirmware_net3
                     {
                         IsMock = args.Contains("-mock", StringComparer.OrdinalIgnoreCase),
                         IsRegister = args.Contains("-register", StringComparer.OrdinalIgnoreCase),
+                        IsInteractive = args.Contains("-interactive", StringComparer.OrdinalIgnoreCase),
                         IsRegistered = CheckDeviceAlreadyRegistered()
                     };
                     services.AddSingleton(flags);
@@ -45,11 +53,17 @@ namespace RfidFirmware_net3
                         Environment.Exit(0);
                     }
 
-
-                    if (flags.IsMock)
+                    if (flags.IsMock || flags.IsInteractive)
                     {
                         services.AddSingleton<IGpioService, MockGpioService>();
-                        services.AddSingleton<IRfidService, MockRfidService>();
+                        if (flags.IsInteractive)
+                        {
+                            services.AddSingleton<IRfidService, MockRfidServiceInteractive>();
+                        }
+                        else
+                        {
+                            services.AddSingleton<IRfidService, MockRfidService>();
+                        }
                     }
                     else
                     {
@@ -80,6 +94,38 @@ namespace RfidFirmware_net3
 
                     services.AddHostedService<Worker>();
                 });
+
+        private static void ValidateReaderSettings(IConfiguration configuration)
+        {
+            var readerSection = configuration.GetSection("Reader");
+            if (!readerSection.Exists())
+            {
+                throw new InvalidOperationException("Section 'Reader' does not exist in appsettings.json.");
+            }
+
+            var hexRegex = new Regex("^[0-9A-Fa-f]{2}$");
+
+            for (int i = 1; i <= 6; i++)
+            {
+                var key = $"TagEpc_{i}";
+                var value = readerSection[key];
+
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    throw new InvalidOperationException($"Missing value for {key} in appsettings.json.");
+                }
+
+                if (value.Length != 2)
+                {
+                    throw new InvalidOperationException($"{key} must have exactly 2 characters (current value: '{value}').");
+                }
+
+                if (!hexRegex.IsMatch(value))
+                {
+                    throw new InvalidOperationException($"{key} must be valid hexadecimal value (current value: '{value}').");
+                }
+            }
+        }
                 
         private static bool CheckDeviceAlreadyRegistered()
         {

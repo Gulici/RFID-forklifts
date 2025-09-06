@@ -38,6 +38,7 @@ namespace RfidFirmware.Services
 
         public void HandleTag(Tag tag, int gpioNr)
         {
+            _logger.LogDebug($"INSIDE HandleTag TagHandlerOnline, last read epc: {_readedEpc}");
             if (gpioNr > 0)
             {
                 if (gpioNr < 6 && !_readedEpc.Contains(tag.Epc))
@@ -57,6 +58,13 @@ namespace RfidFirmware.Services
                         _gpioService.SetGpio6(true);
                     }
                 }
+                return;
+            }
+            else if (!_readedEpc.Contains(tag.Epc))
+            {
+                _readedEpc = tag.Epc;
+                _lastTag = tag;
+                _apiService.SendTagAsync(tag);
             }
         }
 

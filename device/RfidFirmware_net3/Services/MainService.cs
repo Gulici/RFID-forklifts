@@ -92,6 +92,7 @@ namespace RfidFirmware.Services
         {
             _logger.LogInformation($"READED EPC  : {tag.Epc} antenna: {tag.AntennaNr}");
             var gpioNr = MapTagEpcToGpio(tag);
+            _logger.LogDebug($"READED EPC MAPPED TO {gpioNr} VALUE");
             _tagHandler.HandleTag(tag, gpioNr);
         }
 
@@ -105,7 +106,7 @@ namespace RfidFirmware.Services
             bool antennaFor_6 = _settings.AntennasForGpio4[tag.AntennaNr - 1];
             string epc = tag.Epc;
 
-            return epc switch
+            return epc[^2..] switch
             {
                 var e when e == _settings.TagEpc_1 && antennaFor_1_5 => 1,
                 var e when e == _settings.TagEpc_2 && antennaFor_1_5 => 2,
