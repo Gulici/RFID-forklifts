@@ -13,6 +13,7 @@ import kcz.rfid.backend.model.repository.LocationRepository;
 import kcz.rfid.backend.service.LocationService;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -92,7 +93,7 @@ public class LocationServiceImpl extends EntityServiceBase<LocationEntity> imple
         locationHistoryEntity.setLocation(location);
         locationHistoryEntity.setDevice(device);
 
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
         locationHistoryEntity.setTimestamp(now);
         device.setTimestamp(now);
 

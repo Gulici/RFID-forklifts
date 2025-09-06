@@ -20,6 +20,7 @@ import kcz.rfid.backend.service.DeviceService;
 import kcz.rfid.backend.service.FirmService;
 import kcz.rfid.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,7 @@ import java.util.UUID;
 @RequestMapping("/devices")
 @RequiredArgsConstructor
 @Tag(name = "Device", description = "Operations related to device management")
+@Slf4j
 public class DeviceController {
 
     private final DeviceService deviceService;
@@ -189,6 +191,8 @@ public class DeviceController {
 
         UUID deviceId = deviceAuth.getDeviceId();
         UUID firmId = deviceAuth.getFirmId();
+
+        log.debug("EPC from device {} : {}", deviceId, dto.getEpcCode());
 
         boolean valid = Objects.equals(dto.getId(), deviceId) && Objects.equals(dto.getFirmId(), firmId);
         if (!valid) {

@@ -36,4 +36,10 @@ springdoc:
 
 epc:
   parser:
-    strategy: test
+    strategy: default
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    kcz.rfid.backend: debug

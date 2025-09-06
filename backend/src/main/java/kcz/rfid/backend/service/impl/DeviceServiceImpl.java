@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.UUID;
@@ -64,7 +65,7 @@ public class DeviceServiceImpl extends EntityServiceBase<DeviceEntity> implement
 
     @Override
     public void updateLocation(DeviceEntity device, LocationEntity locationEntity) {
-        device.setLastSeen(LocalDateTime.now());
+        device.setLastSeen(Instant.now());
 
         LocationEntity currentLocation = device.getLocation();
         if (currentLocation == null || !currentLocation.equals(locationEntity)) {

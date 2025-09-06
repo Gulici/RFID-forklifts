@@ -117,12 +117,12 @@ public class JwtService {
         final String username = this.extractUsername(token);
         return extractTokenType(token).equals(TokenType.USER.toString())
                 && username.equals(userDetails.getUsername())
-                && isTokenExpired(token);
+                && !isTokenExpired(token);
     }
 
     public boolean validateDeviceToken(String token, UUID expectedDeviceId) {
         return extractTokenType(token).equals(TokenType.DEVICE.toString())
                 && extractDeviceId(token).equals(expectedDeviceId)
-                && isTokenExpired(token);
+                && !isTokenExpired(token);
     }
 }

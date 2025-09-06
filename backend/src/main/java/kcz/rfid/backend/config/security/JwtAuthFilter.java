@@ -31,6 +31,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            logger.debug("No Authorization header found");
             filterChain.doFilter(request, response);
             return;
         }

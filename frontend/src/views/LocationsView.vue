@@ -27,7 +27,7 @@
             <td>{{ location.name }}</td>
             <td>
               <span v-if="location.zoneId !== null">
-                {{ location.zoneId }} (0x{{ location.zoneId.toString(16).toUpperCase() }})
+                {{ location.zoneId }} (0x{{ location.zoneId.toString(16).toUpperCase().padStart(4, '0') }})
               </span>
               <span v-else>-</span>
             </td>
@@ -84,15 +84,15 @@ const paginatedLocations = computed(() => {
 
 const addLocation = async () => {
   try {
-    const hexRegex = /^[0-9A-Fa-f]{1,2}$/;
+    const hexRegex = /^[0-9A-Fa-f]{4}$/;
     if (!hexRegex.test(zoneId.value)) {
-      alert('Zone ID must be a valid 1-2 digit hexadecimal number (00-FF)');
+      alert('Zone ID must be a valid 4 digit hexadecimal number (00-FF)');
       return;
     }
 
     const parsedZoneId = parseInt(zoneId.value, 16);
     if (isNaN(parsedZoneId)) {
-      alert('Invalid format Zone ID (enter hex number, ex. "1A")');
+      alert('Invalid format Zone ID (enter 4 hex digits, ex. "1A3F")');
       return;
     }
 
