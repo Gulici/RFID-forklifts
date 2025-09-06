@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 public class DefaultEpcParser implements EpcParser {
     @Override
     public int parseZoneEpc(String epcCode) {
-        String zoneIdHex = epcCode.substring(4, 6);
+        String zoneIdHex = epcCode.substring(2, 6);
         return Integer.parseInt(zoneIdHex, 16);
     }
 }

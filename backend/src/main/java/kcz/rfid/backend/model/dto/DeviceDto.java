@@ -3,7 +3,7 @@ package kcz.rfid.backend.model.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Data
@@ -18,5 +18,5 @@ public class DeviceDto {
     @Schema(description = "Field telling if device is currently on, based on lastSeen timestamp", example = "true")
     private boolean isAlive;
     @Schema(description = "Time of last location change", example = "2025-07-30T12:34:56")
-    private LocalDateTime timestamp;
+    private Instant timestamp;
 }

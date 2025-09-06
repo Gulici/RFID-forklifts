@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +25,10 @@ public class DeviceEntity extends EntityBase {
     private String fingerprint;
 
     @Column(name = "last_seen")
-    private LocalDateTime lastSeen;
+    private Instant lastSeen;
 
     @Column(name = "timestamp")
-    private LocalDateTime timestamp;
+    private Instant timestamp;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "firm_id", nullable = false)
@@ -41,6 +43,6 @@ public class DeviceEntity extends EntityBase {
 
     @Transient
     public boolean isAlive() {
-        return lastSeen != null && lastSeen.isAfter(LocalDateTime.now().minusMinutes(2));
+        return lastSeen != null && lastSeen.isAfter(Instant.now().minus(Duration.ofMinutes(2)));
     }
 }

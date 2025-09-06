@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 
@@ -55,11 +56,14 @@ public class JwtService {
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
+        Instant now = Instant.now();
+        Instant expiresAt = now.plusSeconds(3600 * 24);
+
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(expiresAt))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -105,7 +109,8 @@ public class JwtService {
     }
 
     private boolean isTokenExpired(String token) {
-        return !extractExpiration(token).before(new Date());
+        Instant expiration = extractExpiration(token).toInstant();
+        return Instant.now().isAfter(expiration);
     }
 
     public Boolean validateUserToken(String token, UserDetails userDetails) {

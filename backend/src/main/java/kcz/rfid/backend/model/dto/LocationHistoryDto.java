@@ -3,6 +3,7 @@ package kcz.rfid.backend.model.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -16,5 +17,5 @@ public class LocationHistoryDto {
     @Schema(description = "Location information")
     private LocationDto locationDto;
     @Schema(description = "Timestamp of the location record", example = "2025-07-30T12:34:56")
-    private LocalDateTime timestamp;
+    private Instant timestamp;
 }
